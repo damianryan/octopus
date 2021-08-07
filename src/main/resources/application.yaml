@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: octopus-client
+
+octopus:
+  region: _A
+  tariff_type: direct_debit_monthly
+  base-url: https://api.octopus.energy/v1/
+  elec-url: electricity-meter-points/1023478344578/meters/18M0065086/consumption/
+  products-url: products/
