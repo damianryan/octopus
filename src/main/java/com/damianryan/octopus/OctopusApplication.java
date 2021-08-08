@@ -4,12 +4,13 @@ import com.damianryan.octopus.model.*;
 import com.damianryan.octopus.util.Pair;
 import com.damianryan.octopus.util.Prices;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -19,73 +20,77 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@EnableConfigurationProperties(OctopusProperties.class)
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class OctopusApplication implements CommandLineRunner {
 
-    @Value("${octopus.base-url}")
-    String baseUrl;
+    private static final String GO = "Go";
 
-    @Value("${octopus.elec-url}")
-    String electricityUrl;
+    OctopusProperties properties;
 
-    @Value("${octopus.account-url}")
-    String accountUrl;
+    WebClient client;
 
-    @Value("${octopus.products-url}")
-    String productsUrl;
-
-    @Value("${octopus.api-key}")
-    String apiKey;
-
-    @Value("${octopus.region}")
-    String region;
-
-    @Value("${octopus.tariff-type}")
-    String tariffType;
-
-    public static void main(String[] args) {
+    public static void main(String... args) {
         SpringApplication.run(OctopusApplication.class, args);
     }
 
     @Override
     public void run(String... args) {
-        WebClient client = WebClient.create();
-        List<Products> productsList = getMany(client, baseUrl + productsUrl, Products.class);
-        List<Product> productStubs = new ArrayList<>();
-        productsList.stream().map(Products::getResults).forEach(productStubs::addAll);
-        log.info("filtering Go products and requesting fuller information...");
-        List<Product> goProducts = productStubs.stream()
-                                             .filter(product -> product.getFullName().contains("Go"))
-                                             .map(product -> get(client, product.getLinks().iterator().next().getHref(), Product.class))
-                                             .collect(Collectors.toList());
-        Map<String, Tariff> goTariffs = new HashMap<>();
-        log.info("getting monthly direct debit tariffs for eastern region for Go products...");
-        goProducts.forEach(product -> goTariffs.put(product.getFullName(), product.getSingleRegisterElectricityTariffs().get(region).get(tariffType)));
-        Map<String, Pair<StandingCharge, List<StandardUnitRate>>> goRates = new HashMap<>();
-        log.info("getting standing charges and standard unit rates for Go tariffs");
-        goTariffs.forEach((name, tariff) -> goRates.put(name, Pair.of(get(client, tariff.getLinks().get(0).getHref(), StandingCharge.class),
-                                                                       getMany(client, tariff.getLinks().get(1).getHref(), StandardUnitRate.class))));
-        List<Prices> goPrices = new ArrayList<>();
-        log.info("extracting prices from tariffs...");
-        goRates.forEach((name, pair) -> goPrices.add(Prices.of(name,
-                                                               pair.getLeft()
-                                                                   .getResults()
-                                                                   .iterator()
-                                                                   .next(),
-                                                               pair.getRight()
-                                                                   .stream()
-                                                                   .map(Response::getResults)
-                                                                   .flatMap(List::stream)
-                                                                   .sorted(Comparator.comparing(Price::getValidFrom))
-                                                                   .collect(lastN(2)))));
-        goPrices.sort(Comparator.comparing(Prices::getValue));
-        goPrices.forEach(prices -> log.info("{}", prices));
+        logGoTariffs();
         logConsumption(client);
+    }
+
+    private void logGoTariffs() {
+        log.info("fetching products, filtering just 'Octopus Go' products, requesting tariffs, extracting Eastern region monthly direct debit tariff and sorting prices from lowest to highest");
+        // stage 1 - retrieve ALL product stub wrappers
+        List<Prices> goPrices = getProductStubWrappers().stream()                                                           // Stream<Products>
+                                                        .map(ProductStubWrapper::getResults)                                // Stream<List<Product>> (stub products)
+                                                        .flatMap(List::stream)                                              // Stream<Product> (stub products)
+                                                        .filter(octopusGoProductStubs())                                        // Stream<Product> (stub products)
+                                                        .map(this::getProductsWithTariffs)                                  // Stream<Product> (products with tariffs)
+                                                        .map(this::extractEasternRegionMonthlyDirectDebitTariffs)           // Stream<Pair<String, Tariff>>
+                                                        .map(this::extractStandingChargeAndAllStandardUnitRates)            // Stream<Pair<String, Pair<StandingCharge, List<StandardUnitRate>>>>
+                                                        .map(this::extractStandingChargeAndJustLowAndHighStandardUnitRates) // Stream<Prices>
+                                                        .sorted(Comparator.comparing(Prices::amount))                     // Stream<Prices> (sorted)
+                                                        .collect(Collectors.toList());                                      // List<Prices>
+        goPrices.forEach(prices -> log.info("{}", prices));
+    }
+
+    private List<ProductStubWrapper> getProductStubWrappers() {
+        return getMany(client, properties.getProductsUrl(), ProductStubWrapper.class);
+    }
+
+    private Predicate<ProductStub> octopusGoProductStubs() {
+        return productStub -> productStub.getFullName().contains(GO);
+    }
+
+    private Product getProductsWithTariffs(ProductStub product) {
+        return get(client, product.getLinks().iterator() .next().getHref(), Product.class);
+    }
+
+    private Pair<String, Tariff> extractEasternRegionMonthlyDirectDebitTariffs(Product product) {
+        return Pair.of(product.getFullName(), product.getSingleRegisterElectricityTariffs()
+                                                     .get(properties.getRegion())
+                                                     .get(properties.getTariffType()));
+    }
+
+    private Pair<String, Pair<StandingCharge, List<StandardUnitRate>>> extractStandingChargeAndAllStandardUnitRates(Pair<String, Tariff> pair) {
+        return Pair.of(pair.getLeft(),
+                       Pair.of(get(client, pair.getRight() .getLinks().get(0).getHref(), StandingCharge.class),
+                               getMany(client, pair.getRight().getLinks().get(1).getHref(), StandardUnitRate.class)));
+    }
+
+    private Prices extractStandingChargeAndJustLowAndHighStandardUnitRates(Pair<String, Pair<StandingCharge, List<StandardUnitRate>>> pair) {
+        return Prices.of(pair.getLeft(),
+                         pair.getRight().getLeft().getResults().iterator().next(),
+                         pair.getRight().getRight().stream().map(Response::getResults).flatMap(List::stream).sorted(Comparator.comparing(Price::getValidFrom)).collect(lastN(2)));
     }
 
     public static <T> Collector<T, ?, List<T>> lastN(int n) {
@@ -103,10 +108,7 @@ public class OctopusApplication implements CommandLineRunner {
     }
 
     private void logConsumption(WebClient client) {
-        List<Consumption> consumptions = getMany(client, baseUrl + electricityUrl, Consumption.class);
-        List<Reading> readings = new ArrayList<>();
-        consumptions.stream().map(Consumption::getResults).forEach(readings::addAll);
-        Collections.sort(readings);
+        List<Reading> readings = getMany(client, properties.getElectricityUrl(), Consumption.class).stream().map(Consumption::getResults).flatMap(List::stream).sorted().collect(Collectors.toList());
         Instant earliest = readings.get(0).getFrom();
         Instant latest = readings.get(readings.size() - 1).getTo();
         log.info("between {} and {} used {}kWh", earliest, latest, readings.stream().mapToDouble(Reading::getConsumption).sum());
@@ -142,7 +144,7 @@ public class OctopusApplication implements CommandLineRunner {
         return client.get()
                      .uri(url)
                      .accept(MediaType.APPLICATION_JSON)
-                     .headers(header -> header.setBasicAuth(apiKey, ""))
+                     .headers(header -> header.setBasicAuth(properties.getApiKey(), ""))
                      .retrieve()
                      .bodyToMono(type)
                      .block();

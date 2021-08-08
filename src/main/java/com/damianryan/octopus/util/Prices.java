@@ -27,12 +27,16 @@ public class Prices implements Comparable<Prices>{
 
     Price standardUnitRate2;
 
-    @ToString.Include(rank = 2)
-    public double getValue() {
-        return standingCharge.getValueIncVAT() + getValue(standardUnitRate1) + getValue(standardUnitRate2);
+    private double amountValue() {
+        return standingCharge.getValueIncVAT() + amount(standardUnitRate1) + amount(standardUnitRate2);
     }
 
-    private double getValue(Price price) {
+    @ToString.Include(rank = 2)
+    public String amount() {
+        return String.format("%.2f", amountValue());
+    }
+
+    private double amount(Price price) {
         Instant validFrom = price.getValidFrom();
         Instant validTo = price.getValidTo();
         return Duration.between(validFrom, validTo).toHours() * price.getValueIncVAT();
@@ -40,6 +44,6 @@ public class Prices implements Comparable<Prices>{
 
     @Override
     public int compareTo(Prices other) {
-        return Double.compare(getValue(), other.getValue());
+        return Double.compare(amountValue(), other.amountValue());
     }
 }
