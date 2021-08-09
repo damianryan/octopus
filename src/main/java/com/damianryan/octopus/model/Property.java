@@ -21,7 +21,8 @@ public class Property {
     Instant movedInAt;
 
     @JsonProperty("moved_out_at")
-    @Nullable Instant movedOutAt;
+    @Nullable
+    Instant movedOutAt;
 
     @JsonProperty("address_line_1")
     String addressLine1;

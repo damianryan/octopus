@@ -14,6 +14,8 @@ class OctopusProperties {
 
     String electricityUrl;
 
+    String gasUrl;
+
     String accountUrl;
 
     String productsUrl;
@@ -26,6 +28,10 @@ class OctopusProperties {
 
     String getElectricityUrl() {
         return baseUrl + electricityUrl;
+    }
+
+    String getGasUrl() {
+        return baseUrl + gasUrl;
     }
 
     String getAccountUrl() {

@@ -15,9 +15,11 @@ public class Response<T> {
 
     long count;
 
-    @Nullable String next;
+    @Nullable
+    String next;
 
-    @Nullable String previous;
+    @Nullable
+    String previous;
 
     List<T> results;
 }

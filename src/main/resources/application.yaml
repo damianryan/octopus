@@ -6,5 +6,9 @@ octopus:
   region: _A
   tariff_type: direct_debit_monthly
   base-url: https://api.octopus.energy/v1/
-  electricity-url: electricity-meter-points/1023478344578/meters/18M0065086/consumption/
-  products-url: products/
+  electricity-url: electricity-meter-points/${octopus.mpan}/meters/${octopus.electricity-meter-serial-number}/consumption/
+  gas-url: gas-meter-points/${octopus.mprn}/meters/${octopus.gas-meter-serial-number}/consumption/
+  products-url: products/?is_variable=false&is_green=true&is_tracker=false&is_prepay=false&is_business=false&is_restricted=false
+
+solar-edge:
+  base-url: https://monitoringapi.solaredge.com/
