@@ -27,7 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -145,9 +145,9 @@ public class OctopusApplication implements CommandLineRunner {
             log.info("used {}kWh between {} and {} ", readings.stream().mapToDouble(Reading::getConsumption).sum(), earliest, latest);
             log.info("calculating daily usage...");
             MultiValueMap<LocalDate, Reading> dailyResults = new LinkedMultiValueMap<>();
-            readings.forEach(result -> dailyResults.add(LocalDate.ofInstant(result.getFrom(), ZoneOffset.UTC), result));
+            readings.forEach(result -> dailyResults.add(LocalDate.ofInstant(result.getFrom(), ZoneId.systemDefault()), result));
             for (Map.Entry<LocalDate, List<Reading>> entry : dailyResults.entrySet()) {
-                log.info("{}: {}kWh", entry.getKey(), entry.getValue().stream().mapToDouble(Reading::getConsumption).sum());
+                log.info("{}: {}kWh", entry.getKey(), String.format("%.2f", entry.getValue().stream().mapToDouble(Reading::getConsumption).sum()));
             }
         } else {
             log.info("no readings available");
