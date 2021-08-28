@@ -20,9 +20,10 @@ public class Prices implements Comparable<Prices> {
 
     public static Prices of(String name, Price standingCharge, List<Price> standardUnitRates) {
         standardUnitRates.sort(Comparator.comparing(Price::getValueIncVAT));
+        int highestIndex = standardUnitRates.size() > 1 ? 1 : 0;
         return new Prices(name,
                           StandardUnitRatePrice.of(standardUnitRates.get(0)),
-                          StandardUnitRatePrice.of(standardUnitRates.get(1)),
+                          StandardUnitRatePrice.of(standardUnitRates.get(highestIndex)),
                           StandingChargePrice.of(standingCharge));
     }
 

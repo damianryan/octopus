@@ -1,14 +1,35 @@
 spring:
   application:
     name: octopus-client
+  main:
+    banner-mode: off
 
 octopus:
+  # the date when the switch to Octopus was arranged (and so when the tariffs were chosen)
+  initial-switch-date: 2021-06-14T23:00Z
+  # the date when the switch to Octopus actually occurred
+  period-from: 2021-07-01T23:00Z
+  # eastern england
   region: _A
+  # direct debit
   tariff_type: direct_debit_monthly
-  base-url: https://api.octopus.energy/v1/
-  electricity-url: electricity-meter-points/${octopus.mpan}/meters/${octopus.electricity-meter-serial-number}/consumption/
-  gas-url: gas-meter-points/${octopus.mprn}/meters/${octopus.gas-meter-serial-number}/consumption/
-  products-url: products/?is_variable=false&is_green=true&is_tracker=false&is_prepay=false&is_business=false&is_restricted=false
+  # order consumption chronologically rather than most recent first
+  consumption-order-by: period
+  # the fixed rate product in force at the time of the switch
+  fixed-rate-product-code: OE-FIX-24M-21-05-29
+  # the 'go' product switched to on 2021-08-11
+  go-product-code: GO-21-05-13
+  # base URL of Octopus's REST API
+  base-url: https://api.octopus.energy/v1
+  account-url: ${octopus.base-url}/accounts/${octopus.account-number}/
+  electricity-consumption-url: ${octopus.base-url}/electricity-meter-points/${octopus.mpan}/meters/${octopus.electricity-meter-serial-number}/consumption/?period_from=${octopus.period-from}&order_by=${octopus.consumption-order-by}
+  gas-consumption-url: ${octopus.base-url}/gas-meter-points/${octopus.mprn}/meters/${octopus.gas-meter-serial-number}/consumption/?period_from=${octopus.period-from}&order_by=${octopus.consumption-order-by}
+  products-url: ${octopus.base-url}/products/?available_at=${octopus.initial-switch-date}&is_variable=false&is_prepay=false&is_restricted=false
+  green-fixed-rate-products-url: ${octopus.base-url}/products/?is_variable=false&is_green=true&is_tracker=false&is_prepay=false&is_business=false&is_restricted=false
+  electricity-tariffs-url: ${octopus.base-url}/products/@product-code/electricity-tariffs/@tariff-code
+  gas-tariffs-url: ${octopus.base-url}/products/${octopus.variable-rate-product-code}/gas-tariffs/@tariff-code/
+  standing-charges-path: standing-charges/
+  standard-unit-rates-path: standard-unit-rates/
 
 solar-edge:
   base-url: https://monitoringapi.solaredge.com/

@@ -1,5 +1,6 @@
 package com.damianryan.octopus.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE)
-public class Response<T> {
+public class Page<T> {
 
     long count;
 
@@ -21,5 +22,6 @@ public class Response<T> {
     @Nullable
     String previous;
 
-    List<T> results;
+    @JsonProperty("results")
+    List<T> content;
 }

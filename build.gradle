@@ -1,12 +1,17 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.3'
+    id 'org.springframework.boot' version '2.5.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
 }
 
 group = 'com.damianryan'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+}
 
 configurations {
     compileOnly {

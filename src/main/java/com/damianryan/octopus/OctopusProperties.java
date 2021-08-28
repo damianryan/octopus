@@ -10,15 +10,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class OctopusProperties {
 
-    String baseUrl;
-
-    String electricityUrl;
-
-    String gasUrl;
-
     String accountUrl;
 
     String productsUrl;
+
+    String electricityConsumptionUrl;
+
+    String electricityTariffsUrl;
+
+    String gasConsumptionUrl;
+
+    String gasTariffsUrl;
+
+    String greenFixedRateProductsUrl;
 
     String apiKey;
 
@@ -26,19 +30,11 @@ class OctopusProperties {
 
     String tariffType;
 
-    String getElectricityUrl() {
-        return baseUrl + electricityUrl;
-    }
+    String standingChargesPath;
 
-    String getGasUrl() {
-        return baseUrl + gasUrl;
-    }
+    String standardUnitRatesPath;
 
-    String getAccountUrl() {
-        return baseUrl + accountUrl;
-    }
+    String fixedRateProductCode;
 
-    String getProductsUrl() {
-        return baseUrl + productsUrl;
-    }
+    String goProductCode;
 }

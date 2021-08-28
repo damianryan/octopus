@@ -10,5 +10,5 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class StandardUnitRate extends Response<Price> {
+public class StandardUnitRate extends Page<Price> {
 }

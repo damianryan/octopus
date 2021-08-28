@@ -10,5 +10,5 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductStubWrapper extends Response<ProductStub> {
+public class Products extends Page<Product> {
 }

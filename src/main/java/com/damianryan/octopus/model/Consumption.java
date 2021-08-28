@@ -10,5 +10,5 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Consumption extends Response<Reading> {
+public class Consumption extends Page<Reading> {
 }

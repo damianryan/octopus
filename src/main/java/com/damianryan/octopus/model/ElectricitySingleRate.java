@@ -1,14 +1,16 @@
 package com.damianryan.octopus.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class StandingCharge extends Page<Price> {
+public class ElectricitySingleRate {
+
+    @JsonProperty("electricity_standard")
+    int electricityStandard;
 }
