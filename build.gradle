@@ -1,21 +1,16 @@
 plugins {
     id 'org.springframework.boot' version '2.5.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.30'
+    id "org.jetbrains.kotlin.plugin.spring" version '1.5.30'
 }
 
 group = 'com.damianryan'
 version = '0.0.1-SNAPSHOT'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(16)
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = JavaLanguageVersion.of(16).toString()
     }
 }
 
@@ -24,14 +19,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    compileOnly 'org.projectlombok:lombok'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

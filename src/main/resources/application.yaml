@@ -4,6 +4,10 @@ spring:
   main:
     banner-mode: off
 
+logging:
+  level:
+    web: info
+
 octopus:
   # the date when the switch to Octopus was arranged (and so when the tariffs were chosen)
   initial-switch-date: 2021-06-14T23:00Z
@@ -15,9 +19,9 @@ octopus:
   tariff_type: direct_debit_monthly
   # order consumption chronologically rather than most recent first
   consumption-order-by: period
-  # the fixed rate product in force at the time of the switch
+  # the fixed rate product that was in force at the time of the switch
   fixed-rate-product-code: OE-FIX-24M-21-05-29
-  # the 'go' product switched to on 2021-08-11
+  # the 'go' product switched to for electricity only on 2021-08-11
   go-product-code: GO-21-05-13
   # base URL of Octopus's REST API
   base-url: https://api.octopus.energy/v1
