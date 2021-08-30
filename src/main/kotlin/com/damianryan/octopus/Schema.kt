@@ -79,7 +79,7 @@ open class Page<T> {
     var content: List<T>? = null
 
     override fun toString(): String {
-        return "previous: ${previous}, next: ${next}, content: ${content?.size}/${count}"
+        return "Consumption(previous: ${previous}, next: ${next}, content: ${content?.size}/${count})"
     }
 }
 
