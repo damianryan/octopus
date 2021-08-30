@@ -75,8 +75,7 @@ open class Page<T> {
     var count: Long = 0
     var next: String? = null
     var previous: String? = null
-    @JsonProperty("results")
-    var content: List<T>? = null
+    @JsonProperty("results") var content: List<T>? = null
 
     override fun toString(): String {
         return "Consumption(previous: ${previous}, next: ${next}, content: ${content?.size}/${count})"
