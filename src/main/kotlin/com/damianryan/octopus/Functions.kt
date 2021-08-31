@@ -18,7 +18,7 @@ fun toLocalDateTime(time: Instant?): LocalDateTime? {
     return LocalDateTime.ofInstant(time, ZoneId.systemDefault())
 }
 
-fun formatDateTime(time: Instant?): String? {
+fun formatLocalDateTime(time: Instant?): String? {
     return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(toLocalDateTime(time))
 }
 

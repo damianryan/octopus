@@ -1,65 +1,108 @@
 package com.damianryan.octopus
 
-import com.damianryan.octopus.model.Consumption
-import com.damianryan.octopus.model.Page
-import com.damianryan.octopus.model.Reading
+import com.damianryan.octopus.model.*
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.util.UriComponentsBuilder
 import reactor.util.retry.Retry
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.time.Duration
+import java.time.Instant
 
 @Component
 @EnableConfigurationProperties(OctopusProperties::class)
 class OctopusAPI(val client: WebClient, val config: OctopusProperties) {
 
-//    val account: Account
-//        get() = getSingle(config.accountUrl!!, Account::class.java)
+    val account: Account by lazy {
+        getSingle(
+            UriComponentsBuilder.fromUriString(config.accountsUrl!!)
+                .uriVariables(mapOf(ACCOUNT_NUMBER to config.accountNumber!!))
+                .toUriString(),
+            Account::class.java
+        )
+    }
 
-    val gasReadings: List<Reading?>
-        get() {
-            log.info("fetching gas consumption")
-            return getMany(config.gasConsumptionUrl!!, Consumption::class.java)
-        }
+    val home: Property by lazy {
+        account.properties?.get(0)!!
+    }
 
-    val electricityReadings: List<Reading?>
-        get() {
-            log.info("fetching electricity consumption")
-            return getMany(config.electricityConsumptionUrl!!, Consumption::class.java)
-        }
+    val movedInAt: Instant by lazy {
+        home.movedInAt!!
+    }
 
-//    val allProducts: List<Product?>
-//        get() {
-//            log.info("fetching products...")
-//            val timer = StopWatch("products")
-//            timer.start()
-//            val products = getMany(config.productsUrl!!, Products::class.java).map { product: Product? -> populateTariffsFor(product) }
-//            timer.stop()
-//            log.info("{}", timer)
-//            return products
-//        }
+    val electricityMeterPoint: ElectricityMeterPoint by lazy {
+        home.electricityMeterPoints?.get(0)!!
+    }
 
-//    private fun populateTariffsFor(product: Product?): Product {
-//        return getSingle(product?.links!!.first().href, Product::class.java)
-//    }
+    val electricityMeter: ElectricityMeter by lazy {
+        electricityMeterPoint.meters?.get(0)!!
+    }
 
-    private fun <T> getSingle(uri: String, type: Class<T>): T {
-        return client
+    val electricityReadings: List<Reading?> by lazy {
+        log.info("fetching electricity consumption")
+        getMany(
+            UriComponentsBuilder.fromUriString(config.electricityConsumptionUrl!!)
+                .uriVariables(
+                    mapOf(
+                        MPAN to electricityMeterPoint.mpan,
+                        SERIAL_NUMBER to electricityMeter.serialNumber
+                    ))
+                .queryParam(PERIOD_FROM, movedInAt)
+                .toUriString(),
+            Consumption::class.java
+        )
+    }
+
+    val electricityAgreements: List<Agreement> by lazy {
+        electricityMeterPoint.agreements!!
+    }
+
+    /**
+     * Electricity standing charges as daily prices inclusive of from the associated date.
+     */
+    val electricityStandingCharges: Map<Instant, Double> by lazy {
+        electricityAgreements.map { agreement ->
+            Pair(
+                UriComponentsBuilder
+                    .fromUriString(config.electricityStandingChargesUrl!!)
+                    .uriVariables(
+                        mapOf(
+                            PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
+                            TARIFF_CODE to agreement.tariffCode!!
+                        )
+                    )
+                    .toUriString(),
+                agreement.validFrom
+            )
+        }.map { pair ->
+            Pair(
+                getMany(pair.first, StandingCharge::class.java)[0],
+                pair.second
+            )
+        }.associate { it.second!! to it.first?.valueIncVAT!! }
+    }
+
+    fun electricityProductFor(tariffCode: String?) = when (tariffCode) {
+        "E-1R-OE-FIX-24M-21-05-29-A" -> config.fixedRateProductCode!!
+        else -> config.goProductCode!!
+    }
+
+    private fun <T> getSingle(uri: String, type: Class<T>): T =
+        client
             .get()
             .uri(uri)
             .accept(MediaType.APPLICATION_JSON)
             .headers { header: HttpHeaders -> header.setBasicAuth(config.apiKey!!, "") }
             .retrieve()
             .bodyToMono(type)
-            .doOnSuccess { log.info("got {}", it) }
-            .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)).jitter(0.75))
+            .doOnSuccess { log.debug("got {}", it) }
+            .retryWhen(Retry.backoff(MAX_ATTEMPTS, Duration.ofSeconds(INITIAL_BACKOFF_SECONDS)).jitter(JITTER_FACTOR))
             .block()!!
-    }
 
     private fun <T, P : Page<T>> getMany(initialUri: String, type: Class<P>): List<T> {
         val result: MutableList<T> = ArrayList()
@@ -85,40 +128,18 @@ class OctopusAPI(val client: WebClient, val config: OctopusProperties) {
         return result
     }
 
-//    private fun getProductCode(tariffCode: String?): String? {
-//        if (tariffCode!!.contains("GO")) {
-//            return config.goProductCode
-//        } else if (tariffCode.contains("FIX")) {
-//            return config.fixedRateProductCode
-//        }
-//        throw IllegalArgumentException("Unhandled tariff code: $tariffCode")
-//    }
-
-//    private fun getElectricityTariffUrlBase(agreement: Agreement): String {
-//        return config.electricityTariffsUrl
-//            ?.replace("@product-code".toRegex(), getProductCode(agreement.tariffCode)!!)
-//            ?.replace("@tariff-code".toRegex(), agreement.tariffCode!!) + "/"
-//    }
-
     companion object {
-
-        @JvmStatic
         private val log = LoggerFactory.getLogger(OctopusAPI::class.java)
 
-//        private val ISO_LOCAL_DATE_TIME_HH_MM = DateTimeFormatterBuilder()
-//            .parseCaseInsensitive()
-//            .append(DateTimeFormatter.ISO_LOCAL_DATE)
-//            .appendLiteral('T')
-//            .append(DateTimeFormatter.ofPattern("HH:mm"))
-//            .toFormatter()
+        const val ACCOUNT_NUMBER = "accountNumber"
+        const val MPAN = "mpan"
+        const val SERIAL_NUMBER = "serialNumber"
+        const val PERIOD_FROM = "period_from"
+        const val PRODUCT_CODE = "productCode"
+        const val TARIFF_CODE = "tariffCode"
 
-//        private fun dateTime(instant: Instant?): String {
-//            return ISO_LOCAL_DATE_TIME_HH_MM.format(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()))
-//        }
-
-//        private fun getAgreementPeriodParameters(agreement: Agreement): String {
-//            return "/?period_from=" + dateTime(agreement.validFrom) +
-//                    "&period_to=" + dateTime(agreement.validTo)
-//        }
+        const val MAX_ATTEMPTS = 3L
+        const val INITIAL_BACKOFF_SECONDS = 2L
+        const val JITTER_FACTOR = 0.75
     }
 }

@@ -17,23 +17,19 @@ octopus:
   region: _A
   # direct debit
   tariff_type: direct_debit_monthly
-  # order consumption chronologically rather than most recent first
-  consumption-order-by: period
   # the fixed rate product that was in force at the time of the switch
   fixed-rate-product-code: OE-FIX-24M-21-05-29
-  # the 'go' product switched to for electricity only on 2021-08-11
+  # the 'go' product switched to for electricity on 2021-08-12 at 00:00 BST (2021-08-11 23:00Z)
   go-product-code: GO-21-05-13
   # base URL of Octopus's REST API
   base-url: https://api.octopus.energy/v1
-  account-url: ${octopus.base-url}/accounts/${octopus.account-number}/
-  electricity-consumption-url: ${octopus.base-url}/electricity-meter-points/${octopus.mpan}/meters/${octopus.electricity-meter-serial-number}/consumption/?period_from=${octopus.period-from}&order_by=${octopus.consumption-order-by}
-  gas-consumption-url: ${octopus.base-url}/gas-meter-points/${octopus.mprn}/meters/${octopus.gas-meter-serial-number}/consumption/?period_from=${octopus.period-from}&order_by=${octopus.consumption-order-by}
-  products-url: ${octopus.base-url}/products/?available_at=${octopus.initial-switch-date}&is_variable=false&is_prepay=false&is_restricted=false
-  green-fixed-rate-products-url: ${octopus.base-url}/products/?is_variable=false&is_green=true&is_tracker=false&is_prepay=false&is_business=false&is_restricted=false
-  electricity-tariffs-url: ${octopus.base-url}/products/@product-code/electricity-tariffs/@tariff-code
-  gas-tariffs-url: ${octopus.base-url}/products/${octopus.variable-rate-product-code}/gas-tariffs/@tariff-code/
-  standing-charges-path: standing-charges/
-  standard-unit-rates-path: standard-unit-rates/
+  accounts-url: ${octopus.base-url}/accounts/{accountNumber}/
+  electricity-consumption-url: ${octopus.base-url}/electricity-meter-points/{mpan}/meters/{serialNumber}/consumption/?order_by=period
+  gas-consumption-url: ${octopus.base-url}/gas-meter-points/{mprn}/meters/{serialNumber}/consumption/?order_by=period
+
+  electricity-tariffs-url: ${octopus.base-url}/products/{productCode}/electricity-tariffs/{tariffCode}
+  electricity-standing-charges-url: ${octopus.electricity-tariffs-url}/standing-charges/
+  electricity-standard-unit-rates-url: ${octopus.electricity-tariffs-url}/standard-unit-rates/
 
 solar-edge:
   base-url: https://monitoringapi.solaredge.com/

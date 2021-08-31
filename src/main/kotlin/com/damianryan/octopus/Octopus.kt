@@ -18,7 +18,7 @@ class Octopus(val api: OctopusAPI) : CommandLineRunner {
 
     override fun run(vararg args: String) {
         logReadings(api.electricityReadings, "electricity")
-        logReadings(api.gasReadings, "gas")
+        log.info("electricity standing charges: {}", api.electricityStandingCharges)
     }
 
     private fun logReadings(readings: List<Reading?>, type: String) {
@@ -34,7 +34,7 @@ class Octopus(val api: OctopusAPI) : CommandLineRunner {
             log.info("number of readings on last day: {}", numberOfReadingsOnLastDay)
             val penultimateReading = readings[readings.size - 1 - numberOfReadingsOnLastDay]
             var totalDays = readingsByDate.size
-            log.info("total {} usage {} between {} and {} ({} days)", type, kWh(totalUsage), formatDateTime(earliest), formatDateTime(latest), totalDays)
+            log.info("total {} usage {} between {} and {} ({} days)", type, kWh(totalUsage), formatLocalDateTime(earliest), formatLocalDateTime(latest), totalDays)
             if (numberOfReadingsOnLastDay < 48) {
                 totalDays -= 1
                 val lastDaysReadings = readingsByDate[toLocalDate(latest)]
@@ -47,8 +47,8 @@ class Octopus(val api: OctopusAPI) : CommandLineRunner {
                         s(numberOfReadingsOnLastDay),
                         type,
                         kWh(totalUsage),
-                        formatDateTime(earliest),
-                        formatDateTime(penultimateReading!!.to),
+                        formatLocalDateTime(earliest),
+                        formatLocalDateTime(penultimateReading!!.to),
                         totalDays
                     )
                 }
@@ -70,12 +70,13 @@ class Octopus(val api: OctopusAPI) : CommandLineRunner {
             }
             for ((date, usage) in usageByDate) {
                 log.info(
-                    "{}: {} ({} readings){}{}",
+                    "{}: {} ({} readings){}{}{}",
                     date,
                     kWh(usage),
                     numberOfReadingsByDate[date],
                     if (lowest == usage) " (lowest)" else "",
-                    if (highest == usage) " (highest)" else ""
+                    if (highest == usage) " (highest)" else "",
+                    if (48 != numberOfReadingsByDate[date]) " *" else ""
                 )
             }
             log.info("mean usage per day over {} days was: {}", totalDays, kWh(totalUsage / totalDays))
@@ -88,18 +89,6 @@ class Octopus(val api: OctopusAPI) : CommandLineRunner {
             log.info("no readings available")
         }
     }
-
-//    private fun logAccount() {
-//        val allProducts = api.allProducts
-//        val properties = api.account.properties
-//        val electricityAgreements = properties!!.stream()
-//            .map<List<ElectricityMeterPoint?>>(Property::electricityMeterPoints)
-//            .flatMap { obj: List<ElectricityMeterPoint?> -> obj.stream() }
-//            .map<List<Agreement?>>(ElectricityMeterPoint::agreements)
-//            .flatMap { obj: List<Agreement?> -> obj.stream() }
-//            .collect(Collectors.toList())
-//        log.info("done")
-//    }
 
     companion object {
         val log: Logger = LoggerFactory.getLogger(Octopus::class.java)
