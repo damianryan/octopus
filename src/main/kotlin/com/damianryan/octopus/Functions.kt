@@ -6,25 +6,19 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-fun s(count: Int): String {
-    return if (count == 1) "" else "s"
-}
+fun s(count: Int): String = if (count == 1) "" else "s"
 
-fun toLocalDate(time: Instant?): LocalDate? {
-    return LocalDate.ofInstant(time, ZoneId.systemDefault())
-}
+fun toInstant(date: LocalDate): Instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant()
 
-fun toLocalDateTime(time: Instant?): LocalDateTime? {
-    return LocalDateTime.ofInstant(time, ZoneId.systemDefault())
-}
+fun toLocalDate(time: Instant?): LocalDate? = LocalDate.ofInstant(time, ZoneId.systemDefault())
 
-fun formatLocalDateTime(time: Instant?): String? {
-    return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(toLocalDateTime(time))
-}
+fun toLocalDateTime(time: Instant?): LocalDateTime? = LocalDateTime.ofInstant(time, ZoneId.systemDefault())
 
-fun kWh(kWh: Double): String {
-    return String.format("%.2fkWh", kWh)
-}
+fun formatLocalDateTime(time: Instant?): String? = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(toLocalDateTime(time))
+
+fun twoDP(number: Double): String = String.format("%.2f", number)
+
+fun kWh(kWh: Double): String = String.format("%.2fkWh", kWh)
 
 fun median(numbers: List<Double>?): Double {
     val scratch: MutableList<Double> = ArrayList(numbers!!)

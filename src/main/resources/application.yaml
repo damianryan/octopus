@@ -10,11 +10,9 @@ logging:
 
 octopus:
   # the date when the switch to Octopus was arranged (and so when the tariffs were chosen)
-  initial-switch-date: 2021-06-14T23:00Z
+  arrangement-date: 2021-06-14T23:00Z
   # the date when the switch to Octopus actually occurred
   period-from: 2021-07-01T23:00Z
-  # eastern england
-  region: _A
   # direct debit
   tariff_type: direct_debit_monthly
   # the fixed rate product that was in force at the time of the switch
@@ -23,11 +21,12 @@ octopus:
   go-product-code: GO-21-05-13
   # base URL of Octopus's REST API
   base-url: https://api.octopus.energy/v1
-  accounts-url: ${octopus.base-url}/accounts/{accountNumber}/
-  electricity-consumption-url: ${octopus.base-url}/electricity-meter-points/{mpan}/meters/{serialNumber}/consumption/?order_by=period
-  gas-consumption-url: ${octopus.base-url}/gas-meter-points/{mprn}/meters/{serialNumber}/consumption/?order_by=period
+  accounts-url: ${octopus.base-url}/accounts/{account_number}/
+  electricity-mpan-url: ${octopus.base-url}/electricity-meter-points/{mpan}/
+  electricity-consumption-url: ${octopus.electricity-mpan-url}meters/{serial_number}/consumption/?order_by=period
+  gas-consumption-url: ${octopus.base-url}/gas-meter-points/{mprn}/meters/{serial_number}/consumption/?order_by=period
 
-  electricity-tariffs-url: ${octopus.base-url}/products/{productCode}/electricity-tariffs/{tariffCode}
+  electricity-tariffs-url: ${octopus.base-url}/products/{product_code}/electricity-tariffs/{tariff_code}
   electricity-standing-charges-url: ${octopus.electricity-tariffs-url}/standing-charges/
   electricity-standard-unit-rates-url: ${octopus.electricity-tariffs-url}/standard-unit-rates/
 

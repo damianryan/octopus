@@ -9,11 +9,11 @@ data class OctopusProperties(
 
     var accountsUrl: String? = null,
 
+    var electricityMpanUrl: String? = null,
     var electricityConsumptionUrl: String? = null,
     var electricityStandingChargesUrl: String? = null,
     var electricityStandardUnitRatesUrl: String? = null,
 
-    var region: String? = null,
     var tariffType: String? = null,
 
     var fixedRateProductCode: String? = null,

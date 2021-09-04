@@ -1,4 +1,4 @@
-package com.damianryan.octopus.model
+package com.damianryan.octopus
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
@@ -24,6 +24,7 @@ data class Property(
 )
 
 data class ElectricityMeterPoint(
+    @JsonProperty("gsp") var region: String? = null,
     var mpan: String? = null,
     @JsonProperty("profile_class") var profileClass: Int = 0,
     @JsonProperty("consumption_standard") var consumptionStandard: Int = 0,
@@ -78,7 +79,7 @@ open class Page<T> {
     @JsonProperty("results") var content: List<T>? = null
 
     override fun toString(): String {
-        return "Consumption(previous: ${previous}, next: ${next}, content: ${content?.size}/${count})"
+        return "Consumption(previous: $previous, next: $next, content: ${content?.size}/$count)"
     }
 }
 
@@ -116,17 +117,19 @@ data class Product(
 }
 
 @Suppress("unused")
-class StandingCharge : Page<Price?>()
+class StandingCharge : Page<Rate?>()
 
 @Suppress("unused")
-class StandardUnitRate : Page<Price?>()
+class StandardUnitRate : Page<Rate?>()
 
-data class Price(
+data class Rate(
     @JsonProperty("value_exc_vat") var valueExcVAT: Double? = 0.0,
     @JsonProperty("value_inc_vat") var valueIncVAT: Double? = 0.0,
     @JsonProperty("valid_from") var validFrom: Instant? = null,
     @JsonProperty("valid_to") var validTo: Instant? = null
-)
+) {
+    override fun toString()= "Rate(${valueIncVAT}p inc VAT between $validFrom and $validTo)"
+}
 
 data class Tariff(
     var code: String? = null,
@@ -139,9 +142,13 @@ data class Tariff(
     @JsonProperty("exit_fees_exc_vat") var exitFeesExcVAT: Double = 0.0,
     @JsonProperty("exit_fees_inc_vat") var exitFeesIncVAT: Double = 0.0,
     var links: List<Link>? = null,
-    @JsonProperty("standing_unit_rate_exc_vat") var standardUnitRateExcVAT: Double = 0.0,
-    @JsonProperty("standing_unit_rate_inc_vat") var standardUnitRateIncVAT: Double = 0.0
-)
+    @JsonProperty("standard_unit_rate_exc_vat") var standardUnitRateExcVAT: Double = 0.0,
+    @JsonProperty("standard_unit_rate_inc_vat") var standardUnitRateIncVAT: Double = 0.0
+) {
+    override fun toString() = "Tariff(standing charge=${standingChargeIncVAT}p inc VAT per day, online discount=${onlineDiscountIncVAT}p inc VAT, " +
+            "dual fuel discount=${dualFuelDiscountIncVAT}p inc VAT, exit fees=${exitFeesExcVAT}p inc VAT, " +
+            "standard unit rate=${standardUnitRateIncVAT}p inc VAT)"
+}
 
 data class SampleQuote(
     @JsonProperty("electricity_single_rate") var electricitySingleRate: AnnualCost? = null,
@@ -153,7 +160,9 @@ data class SampleQuote(
 data class AnnualCost(
     @JsonProperty("annual_cost_inc_vat") var incVAT: Int = 0,
     @JsonProperty("annual_cost_exc_vat") var excVAT: Int = 0
-)
+) {
+    override fun toString() = "annual cost of £${twoDP((incVAT as kotlin.Double) / 100)}p"
+}
 
 data class SampleConsumption(
     @JsonProperty("electricity_single_rate") var electricitySingleRate: ElectricitySingleRate? = null,
