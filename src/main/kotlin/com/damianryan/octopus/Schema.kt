@@ -28,6 +28,8 @@ data class ElectricityMeterPoint(
     var mpan: String? = null,
     @JsonProperty("profile_class") var profileClass: Int = 0,
     @JsonProperty("consumption_standard") var consumptionStandard: Int = 0,
+    @JsonProperty("consumption_day") var consumptionDay: Int = 0,
+    @JsonProperty("consumption_night") var consumptionNight: Int = 0,
     var meters: List<ElectricityMeter>? = null,
     var agreements: List<Agreement>? = null
 )
@@ -161,7 +163,7 @@ data class AnnualCost(
     @JsonProperty("annual_cost_inc_vat") var incVAT: Int = 0,
     @JsonProperty("annual_cost_exc_vat") var excVAT: Int = 0
 ) {
-    override fun toString() = "annual cost of £${twoDP((incVAT as kotlin.Double) / 100)}p"
+    override fun toString() = "annual cost of £${twoDP(incVAT.toDouble() / 100)}p"
 }
 
 data class SampleConsumption(

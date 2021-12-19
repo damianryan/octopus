@@ -44,7 +44,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
         home.electricityMeterPoints?.get(0)!!
     }
 
-    val eletricityRegion: String by lazy {
+    val electricityRegion: String by lazy {
         getSingle(
             UriComponentsBuilder
                 .fromUriString(config.electricityMpanUrl!!)
@@ -87,7 +87,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
     val totalElectricityStandingCharges: Double by lazy {
         var total = 0.0
         electricityUsageByDate.keys.forEach { date ->
-            electricityStandingCharges.forEach { (interval, charge) ->
+            electricityStandingChargeByInterval.forEach { (interval, charge) ->
                 if (interval.contains(toInstant(date))) {
                     total += charge
                 }
@@ -100,21 +100,21 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
         electricityMeterPoint.agreements!!
     }
 
-    val electricityStandingCharges: Map<Interval, Double> by lazy {
-        val size = electricityStandingChargesMap.size
-        val intervalStarts = electricityStandingChargesMap.keys.sorted()
+    val electricityStandingChargeByInterval: Map<Interval, Double> by lazy {
+        val size = electricityStandingChargeByTimestamp.size
+        val intervalStarts = electricityStandingChargeByTimestamp.keys.sorted()
         val result = mutableMapOf<Interval, Double>()
         var i = 1
         while (i <= size) {
             val from = intervalStarts[i - 1]
             val to = if (i == size) Instant.now() else intervalStarts[i]
-            result.put(Interval.of(from, to), electricityStandingChargesMap[intervalStarts[i - 1]]!!)
+            result.put(Interval.of(from, to), electricityStandingChargeByTimestamp[intervalStarts[i - 1]]!!)
             ++i
         }
         result
     }
 
-    private val electricityStandingChargesMap: Map<Instant, Double> by lazy {
+    private val electricityStandingChargeByTimestamp: Map<Instant, Double> by lazy {
         electricityAgreements.map { agreement ->
             Pair(
                 agreement.validFrom,
@@ -137,12 +137,18 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
         }.associate { it.first!! to it.second?.valueIncVAT!! }
     }
 
-//    private val electricityStandardUnitRateMap: Map<Instant, Double> by lazy {
+//    fun temp(): Map<Instant, Double> {
+//        val standardRateLists = electricityStandardRateLists
+//        var result = mutableMapOf<Instant, Double>()
+//        for (standardRateList in standardRateLists) {
+//            for (rate in standardRateList) {
 //
+//            }
+//        }
 //    }
 
-    fun temp(): List<List<Rate?>> {
-        return electricityAgreements.map { agreement ->
+    private val electricityStandardRateLists: List<List<Rate?>> by lazy {
+        electricityAgreements.map { agreement ->
             UriComponentsBuilder
                 .fromUriString(config.electricityStandardUnitRatesUrl!!)
                 .uriVariables(

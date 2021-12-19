@@ -20,8 +20,8 @@ class Application(val api: Octopus) : CommandLineRunner {
         logReadings(api.electricityReadings, "electricity")
         val totalElectricityStandingCharge = api.totalElectricityStandingCharges
         log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / 100))
-        log.info("electricity region: {}", api.eletricityRegion)
-        log.info("standard unit rates: {}", api.temp())
+        log.info("electricity region: {}", api.electricityRegion)
+//        log.info("standard unit rates: {}", api.temp())
     }
 
     private fun logReadings(readings: List<Reading?>, type: String) {
