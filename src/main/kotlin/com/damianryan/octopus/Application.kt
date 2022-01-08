@@ -18,6 +18,7 @@ class Application(val api: Octopus) : CommandLineRunner {
     override fun run(vararg args: String) {
         log.info("switched to Octopus: {}", api.home.movedInAt)
         logReadings(api.electricityReadings, "electricity")
+        logReadings(api.gasReadings, "gas")
         val totalElectricityStandingCharge = api.totalElectricityStandingCharges
         log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / 100))
         log.info("electricity region: {}", api.electricityRegion)
@@ -33,9 +34,12 @@ class Application(val api: Octopus) : CommandLineRunner {
             val readingsByDate: MultiValueMap<LocalDate?, Reading?> = LinkedMultiValueMap()
             readings.forEach(Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) })
             val numberOfReadingsByDate = readingsByDate.mapValues { it.value.size }
-            val numberOfReadingsOnLastDay = numberOfReadingsByDate[toLocalDate(latest)]!!
+            var numberOfReadingsOnLastDay = numberOfReadingsByDate[toLocalDate(latest)]
+            if (null == numberOfReadingsOnLastDay) {
+                numberOfReadingsOnLastDay = numberOfReadingsByDate[toLocalDate(latest)?.minusDays(1)]
+            }
             log.info("number of readings on last day: {}", numberOfReadingsOnLastDay)
-            val penultimateReading = readings[readings.size - 1 - numberOfReadingsOnLastDay]
+            val penultimateReading = readings[readings.size - 1 - numberOfReadingsOnLastDay!!]
             var totalDays = readingsByDate.size
             log.info("total {} usage {} between {} and {} ({} days)", type, kWh(totalUsage), formatLocalDateTime(earliest), formatLocalDateTime(latest), totalDays)
             if (numberOfReadingsOnLastDay < 48) {

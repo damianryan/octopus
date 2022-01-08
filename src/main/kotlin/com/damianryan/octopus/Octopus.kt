@@ -44,6 +44,10 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
         home.electricityMeterPoints?.get(0)!!
     }
 
+    val gasMeterPoint: GasMeterPoint by lazy {
+        home.gasMeterPoints?.get(0)!!
+    }
+
     val electricityRegion: String by lazy {
         getSingle(
             UriComponentsBuilder
@@ -58,6 +62,10 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
         electricityMeterPoint.meters?.get(0)!!
     }
 
+    val gasMeter: GasMeter by lazy {
+        gasMeterPoint.meters?.get(0)!!
+    }
+
     val electricityReadings: List<Reading?> by lazy {
         log.info("fetching electricity consumption")
         getMany(
@@ -66,6 +74,22 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
                     mapOf(
                         MPAN to electricityMeterPoint.mpan,
                         SERIAL_NUMBER to electricityMeter.serialNumber
+                    )
+                )
+                .queryParam(PERIOD_FROM, movedInAt)
+                .toUriString(),
+            Consumption::class.java
+        )
+    }
+
+    val gasReadings: List<Reading?> by lazy {
+        log.info("fetching gas consumption")
+        getMany(
+            UriComponentsBuilder.fromUriString(config.gasConsumptionUrl!!)
+                .uriVariables(
+                    mapOf(
+                        MPRN to gasMeterPoint.mprn,
+                        SERIAL_NUMBER to gasMeter.serialNumber
                     )
                 )
                 .queryParam(PERIOD_FROM, movedInAt)
@@ -210,6 +234,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
 
         const val ACCOUNT_NUMBER = "account_number"
         const val MPAN = "mpan"
+        const val MPRN = "mprn"
         const val SERIAL_NUMBER = "serial_number"
         const val PERIOD_FROM = "period_from"
         const val PRODUCT_CODE = "product_code"
