@@ -1,5 +1,11 @@
 package com.damianryan.octopus
 
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.util.function.Consumer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.http.HttpHeaders
@@ -11,12 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriComponentsBuilder
 import org.threeten.extra.Interval
 import reactor.util.retry.Retry
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.util.function.Consumer
 
 @Component
 @EnableConfigurationProperties(OctopusProperties::class)
@@ -24,87 +24,59 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
 
     val account: Account by lazy {
         getSingle(
-            UriComponentsBuilder
-                .fromUriString(config.accountsUrl!!)
+            UriComponentsBuilder.fromUriString(config.accountsUrl!!)
                 .uriVariables(mapOf(ACCOUNT_NUMBER to config.accountNumber!!))
                 .toUriString(),
-            Account::class.java
-        )
+            Account::class.java)
     }
 
-    val home: Property by lazy {
-        account.properties?.get(0)!!
-    }
+    val home: Property by lazy { account.properties?.get(0)!! }
 
-    val movedInAt: Instant by lazy {
-        home.movedInAt!!
-    }
+    val movedInAt: Instant by lazy { home.movedInAt!! }
 
-    val electricityMeterPoint: ElectricityMeterPoint by lazy {
-        home.electricityMeterPoints?.get(0)!!
-    }
+    val electricityMeterPoint: ElectricityMeterPoint by lazy { home.electricityMeterPoints?.get(0)!! }
 
-    val gasMeterPoint: GasMeterPoint by lazy {
-        home.gasMeterPoints?.get(0)!!
-    }
+    val gasMeterPoint: GasMeterPoint by lazy { home.gasMeterPoints?.get(0)!! }
 
     val electricityRegion: String by lazy {
         getSingle(
-            UriComponentsBuilder
-                .fromUriString(config.electricityMpanUrl!!)
-                .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan))
-                .toUriString(),
-            ElectricityMeterPoint::class.java
-        ).region!!
+                UriComponentsBuilder.fromUriString(config.electricityMpanUrl!!)
+                    .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan))
+                    .toUriString(),
+                ElectricityMeterPoint::class.java)
+            .region!!
     }
 
-    val electricityMeter: ElectricityMeter by lazy {
-        electricityMeterPoint.meters?.get(0)!!
-    }
+    val electricityMeter: ElectricityMeter by lazy { electricityMeterPoint.meters?.get(0)!! }
 
-    val gasMeter: GasMeter by lazy {
-        gasMeterPoint.meters?.get(0)!!
-    }
+    val gasMeter: GasMeter by lazy { gasMeterPoint.meters?.get(0)!! }
 
     val electricityReadings: List<Reading?> by lazy {
         log.info("fetching electricity consumption")
         getMany(
             UriComponentsBuilder.fromUriString(config.electricityConsumptionUrl!!)
-                .uriVariables(
-                    mapOf(
-                        MPAN to electricityMeterPoint.mpan,
-                        SERIAL_NUMBER to electricityMeter.serialNumber
-                    )
-                )
+                .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan, SERIAL_NUMBER to electricityMeter.serialNumber))
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
-            Consumption::class.java
-        )
+            Consumption::class.java)
     }
 
     val gasReadings: List<Reading?> by lazy {
         log.info("fetching gas consumption")
         getMany(
             UriComponentsBuilder.fromUriString(config.gasConsumptionUrl!!)
-                .uriVariables(
-                    mapOf(
-                        MPRN to gasMeterPoint.mprn,
-                        SERIAL_NUMBER to gasMeter.serialNumber
-                    )
-                )
+                .uriVariables(mapOf(MPRN to gasMeterPoint.mprn, SERIAL_NUMBER to gasMeter.serialNumber))
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
-            Consumption::class.java
-        )
+            Consumption::class.java)
     }
 
     val electricityUsageByDate: Map<LocalDate, Double> by lazy {
         val readingsByDate: MultiValueMap<LocalDate, Reading> = LinkedMultiValueMap()
-        electricityReadings.forEach(Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) })
+        electricityReadings.forEach(
+            Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) })
         val result = mutableMapOf<LocalDate, Double>()
-        readingsByDate.forEach { (date, readings) ->
-            result.put(date, readings.sumOf { it.consumption })
-        }
+        readingsByDate.forEach { (date, readings) -> result.put(date, readings.sumOf { it.consumption }) }
         result
     }
 
@@ -120,9 +92,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
         total
     }
 
-    val electricityAgreements: List<Agreement> by lazy {
-        electricityMeterPoint.agreements!!
-    }
+    val electricityAgreements: List<Agreement> by lazy { electricityMeterPoint.agreements!! }
 
     val electricityStandingChargeByInterval: Map<Interval, Double> by lazy {
         val size = electricityStandingChargeByTimestamp.size
@@ -139,59 +109,51 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
     }
 
     private val electricityStandingChargeByTimestamp: Map<Instant, Double> by lazy {
-        electricityAgreements.map { agreement ->
-            Pair(
-                agreement.validFrom,
-                UriComponentsBuilder
-                    .fromUriString(config.electricityStandingChargesUrl!!)
+        electricityAgreements
+            .map { agreement ->
+                Pair(
+                    agreement.validFrom,
+                    UriComponentsBuilder.fromUriString(config.electricityStandingChargesUrl!!)
+                        .uriVariables(
+                            mapOf(
+                                PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
+                                TARIFF_CODE to agreement.tariffCode!!))
+                        .queryParam(PERIOD_FROM, agreement.validFrom)
+                        .toUriString())
+            }
+            .map { pair -> Pair(pair.first, getMany(pair.second, StandingCharge::class.java)[0]) }
+            .associate { it.first!! to it.second?.valueIncVAT!! }
+    }
+
+    //    fun temp(): Map<Instant, Double> {
+    //        val standardRateLists = electricityStandardRateLists
+    //        var result = mutableMapOf<Instant, Double>()
+    //        for (standardRateList in standardRateLists) {
+    //            for (rate in standardRateList) {
+    //
+    //            }
+    //        }
+    //    }
+
+    private val electricityStandardRateLists: List<List<Rate?>> by lazy {
+        electricityAgreements
+            .map { agreement ->
+                UriComponentsBuilder.fromUriString(config.electricityStandardUnitRatesUrl!!)
                     .uriVariables(
                         mapOf(
                             PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
-                            TARIFF_CODE to agreement.tariffCode!!
-                        )
-                    )
+                            TARIFF_CODE to agreement.tariffCode!!))
                     .queryParam(PERIOD_FROM, agreement.validFrom)
                     .toUriString()
-            )
-        }.map { pair ->
-            Pair(
-                pair.first,
-                getMany(pair.second, StandingCharge::class.java)[0]
-            )
-        }.associate { it.first!! to it.second?.valueIncVAT!! }
+            }
+            .map { getMany(it, StandardUnitRate::class.java) }
     }
 
-//    fun temp(): Map<Instant, Double> {
-//        val standardRateLists = electricityStandardRateLists
-//        var result = mutableMapOf<Instant, Double>()
-//        for (standardRateList in standardRateLists) {
-//            for (rate in standardRateList) {
-//
-//            }
-//        }
-//    }
-
-    private val electricityStandardRateLists: List<List<Rate?>> by lazy {
-        electricityAgreements.map { agreement ->
-            UriComponentsBuilder
-                .fromUriString(config.electricityStandardUnitRatesUrl!!)
-                .uriVariables(
-                    mapOf(
-                        PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
-                        TARIFF_CODE to agreement.tariffCode!!
-                    )
-                )
-                .queryParam(PERIOD_FROM, agreement.validFrom)
-                .toUriString()
-        }.map {
-            getMany(it, StandardUnitRate::class.java)
+    fun electricityProductFor(tariffCode: String?) =
+        when (tariffCode) {
+            FIXED_PRODUCT -> config.fixedRateProductCode!!
+            else -> config.goProductCode!!
         }
-    }
-
-    fun electricityProductFor(tariffCode: String?) = when (tariffCode) {
-        FIXED_PRODUCT -> config.fixedRateProductCode!!
-        else -> config.goProductCode!!
-    }
 
     private fun <T> getSingle(uri: String, type: Class<T>): T =
         client
@@ -217,13 +179,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
             result.addAll(elements)
             val thisCount = elements.size.toLong()
             runningCount += thisCount
-            log.debug(
-                "got {}/{} {} results, running total {}",
-                thisCount,
-                page.count,
-                type.simpleName,
-                runningCount
-            )
+            log.debug("got {}/{} {} results, running total {}", thisCount, page.count, type.simpleName, runningCount)
             uri = if (null != page.next) URLDecoder.decode(page.next, StandardCharsets.UTF_8) else null
         }
         return result

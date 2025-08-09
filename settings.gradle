@@ -1,1 +1,3 @@
 rootProject.name = 'octopus'
+
+enableFeaturePreview "STABLE_CONFIGURATION_CACHE"

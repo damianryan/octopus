@@ -1,24 +1,27 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.2'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
-    id "org.jetbrains.kotlin.plugin.spring" version '1.6.10'
-    id 'com.github.ben-manes.versions' version '0.41.0'
-    id 'java'
+    alias(libs.plugins.benmanesVersions)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlinSpring)
+    alias(libs.plugins.ktfmt)
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springBootDependencies)
 }
 
 group = 'com.damianryan'
 version = '0.0.1-SNAPSHOT'
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = JavaLanguageVersion.of(17).toString()
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(24)
     }
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+kotlin {
+    compilerOptions {
+        progressiveMode = true
+        extraWarnings = true
+        freeCompilerArgs = ["-Xannotation-default-target=param-property"]
     }
 }
 
@@ -27,13 +30,26 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation 'org.threeten:threeten-extra:1.7.0'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // annotation processors
+    annotationProcessor libs.springBoot.configurationProcessor
+
+    // starters
+    implementation libs.springBoot.starter.webflux
+    testImplementation libs.springBoot.starter.test
+
+    // libraries
+    implementation libs.jackson.module.kotlin
+    implementation libs.threeten.extra
+    developmentOnly libs.springBoot.devtools
+}
+
+ktfmt {
+    kotlinLangStyle()
+    maxWidth.set(120)
+    blockIndent.set(4)
+    continuationIndent.set(4)
+    removeUnusedImports.set(true)
+    manageTrailingCommas.set(false)
 }
 
 test {

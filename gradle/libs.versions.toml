@@ -1,0 +1,31 @@
+[versions]
+# plugins
+benManesVersionsPlugin = "0.52.0"
+detektPlugin = "1.23.8"
+ktfmtPlugin = "0.23.0"
+kotlin = "2.2.0"
+springBoot = "3.5.4"
+springDependencyManagementPlugin = "1.1.7"
+
+# libraries
+threeten = "1.8.0"
+
+[libraries]
+# libraries with unmanaged versions
+threeten-extra = { group = "org.threeten", name = "threeten-extra", version.ref = "threeten"}
+
+# libraries with managed versions
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin"}
+springBoot-configurationProcessor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor"}
+springBoot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools"}
+springBoot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux"}
+springBoot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test"}
+
+[plugins]
+benmanesVersions = { id = "com.github.ben-manes.versions", version.ref = "benManesVersionsPlugin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPlugin" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
+kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin"}
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmtPlugin" }
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springBootDependencies = { id = "io.spring.dependency-management", version.ref = "springDependencyManagementPlugin" }

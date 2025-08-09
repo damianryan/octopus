@@ -1,5 +1,8 @@
 package com.damianryan.octopus
 
+import java.time.LocalDate
+import java.util.function.Consumer
+import java.util.stream.Collectors
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
@@ -8,9 +11,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.util.CollectionUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import java.time.LocalDate
-import java.util.function.Consumer
-import java.util.stream.Collectors
 
 @SpringBootApplication
 class Application(val api: Octopus) : CommandLineRunner {
@@ -22,7 +22,7 @@ class Application(val api: Octopus) : CommandLineRunner {
         val totalElectricityStandingCharge = api.totalElectricityStandingCharges
         log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / 100))
         log.info("electricity region: {}", api.electricityRegion)
-//        log.info("standard unit rates: {}", api.temp())
+        //        log.info("standard unit rates: {}", api.temp())
     }
 
     private fun logReadings(readings: List<Reading?>, type: String) {
@@ -41,7 +41,13 @@ class Application(val api: Octopus) : CommandLineRunner {
             log.info("number of readings on last day: {}", numberOfReadingsOnLastDay)
             val penultimateReading = readings[readings.size - 1 - numberOfReadingsOnLastDay!!]
             var totalDays = readingsByDate.size
-            log.info("total {} usage {} between {} and {} ({} days)", type, kWh(totalUsage), formatLocalDateTime(earliest), formatLocalDateTime(latest), totalDays)
+            log.info(
+                "total {} usage {} between {} and {} ({} days)",
+                type,
+                kWh(totalUsage),
+                formatLocalDateTime(earliest),
+                formatLocalDateTime(latest),
+                totalDays)
             if (numberOfReadingsOnLastDay < 48) {
                 totalDays -= 1
                 val lastDaysReadings = readingsByDate[toLocalDate(latest)]
@@ -56,8 +62,7 @@ class Application(val api: Octopus) : CommandLineRunner {
                         kWh(totalUsage),
                         formatLocalDateTime(earliest),
                         formatLocalDateTime(penultimateReading!!.to),
-                        totalDays
-                    )
+                        totalDays)
                 }
             }
             var lowest = Double.MAX_VALUE
@@ -83,15 +88,13 @@ class Application(val api: Octopus) : CommandLineRunner {
                     numberOfReadingsByDate[date],
                     if (lowest == usage) " (lowest)" else "",
                     if (highest == usage) " (highest)" else "",
-                    if (48 != numberOfReadingsByDate[date]) " *" else ""
-                )
+                    if (48 != numberOfReadingsByDate[date]) " *" else "")
             }
             log.info("mean usage per day over {} days was: {}", totalDays, kWh(totalUsage / totalDays))
             log.info(
                 "median usage per day over {} days was: {}",
                 totalDays,
-                kWh(median(usageByDate.values.stream().sorted().collect(Collectors.toList())))
-            )
+                kWh(median(usageByDate.values.stream().sorted().collect(Collectors.toList()))))
         } else {
             log.info("no readings available")
         }

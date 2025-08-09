@@ -3,11 +3,7 @@ package com.damianryan.octopus
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
-@Suppress("unused")
-data class Account(
-    var number: String? = null,
-    var properties: List<Property>? = null
-)
+@Suppress("unused") data class Account(var number: String? = null, var properties: List<Property>? = null)
 
 data class Property(
     var id: Int = 0,
@@ -52,9 +48,7 @@ data class GasMeterPoint(
     var agreements: List<Agreement>? = null
 )
 
-data class GasMeter(
-    @JsonProperty("serial_number") var serialNumber: String? = null
-)
+data class GasMeter(@JsonProperty("serial_number") var serialNumber: String? = null)
 
 data class Agreement(
     @JsonProperty("tariff_code") var tariffCode: String? = null,
@@ -87,8 +81,7 @@ open class Page<T> {
 
 data class Link(val href: String)
 
-@Suppress("unused")
-class Products : Page<Product?>()
+@Suppress("unused") class Products : Page<Product?>()
 
 data class Product(
     var code: String? = null,
@@ -107,8 +100,10 @@ data class Product(
     var links: List<Link>? = null,
     var brand: String? = null,
     @JsonProperty("tariffs_active_at") var tariffsActiveAt: Instant? = null,
-    @JsonProperty("single_register_electricity_tariffs") var singleRegisterElectricityTariffs: Map<String, Map<String, Tariff>>? = null,
-    @JsonProperty("dual_register_electricity_tariffs") var dualRegisterElectricityTariffs: Map<String, Map<String, Tariff>>? = null,
+    @JsonProperty("single_register_electricity_tariffs")
+    var singleRegisterElectricityTariffs: Map<String, Map<String, Tariff>>? = null,
+    @JsonProperty("dual_register_electricity_tariffs")
+    var dualRegisterElectricityTariffs: Map<String, Map<String, Tariff>>? = null,
     @JsonProperty("single_register_gas_tariffs") var singleRegisterGasTariffs: Map<String, Map<String, Tariff>>? = null,
     @JsonProperty("sample_quotes") var sampleQuotes: Map<String, Map<String, SampleQuote>>? = null,
     @JsonProperty("sample_consumption") var sampleConsumption: SampleConsumption? = null
@@ -118,11 +113,9 @@ data class Product(
     }
 }
 
-@Suppress("unused")
-class StandingCharge : Page<Rate?>()
+@Suppress("unused") class StandingCharge : Page<Rate?>()
 
-@Suppress("unused")
-class StandardUnitRate : Page<Rate?>()
+@Suppress("unused") class StandardUnitRate : Page<Rate?>()
 
 data class Rate(
     @JsonProperty("value_exc_vat") var valueExcVAT: Double? = 0.0,
@@ -130,7 +123,7 @@ data class Rate(
     @JsonProperty("valid_from") var validFrom: Instant? = null,
     @JsonProperty("valid_to") var validTo: Instant? = null
 ) {
-    override fun toString()= "Rate(${valueIncVAT}p inc VAT between $validFrom and $validTo)"
+    override fun toString() = "Rate(${valueIncVAT}p inc VAT between $validFrom and $validTo)"
 }
 
 data class Tariff(
@@ -147,7 +140,8 @@ data class Tariff(
     @JsonProperty("standard_unit_rate_exc_vat") var standardUnitRateExcVAT: Double = 0.0,
     @JsonProperty("standard_unit_rate_inc_vat") var standardUnitRateIncVAT: Double = 0.0
 ) {
-    override fun toString() = "Tariff(standing charge=${standingChargeIncVAT}p inc VAT per day, online discount=${onlineDiscountIncVAT}p inc VAT, " +
+    override fun toString() =
+        "Tariff(standing charge=${standingChargeIncVAT}p inc VAT per day, online discount=${onlineDiscountIncVAT}p inc VAT, " +
             "dual fuel discount=${dualFuelDiscountIncVAT}p inc VAT, exit fees=${exitFeesExcVAT}p inc VAT, " +
             "standard unit rate=${standardUnitRateIncVAT}p inc VAT)"
 }
@@ -178,9 +172,7 @@ data class ElectricityDualRate(
     @JsonProperty("electricity_night") var electricityNight: Int = 0
 )
 
-data class ElectricitySingleRate(
-    @JsonProperty("electricity_standard") var electricityStandard: Int = 0
-)
+data class ElectricitySingleRate(@JsonProperty("electricity_standard") var electricityStandard: Int = 0)
 
 data class DualFuelDualRate(
     @JsonProperty("electricity_day") var electricityDay: Int = 0,
