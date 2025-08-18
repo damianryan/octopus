@@ -3,7 +3,7 @@
 benManesVersionsPlugin = "0.52.0"
 detektPlugin = "1.23.8"
 ktfmtPlugin = "0.23.0"
-kotlin = "2.2.0"
+kotlin = "2.2.10"
 springBoot = "3.5.4"
 springDependencyManagementPlugin = "1.1.7"
 
