@@ -47,7 +47,8 @@ class Application(val api: Octopus) : CommandLineRunner {
                 kWh(totalUsage),
                 formatLocalDateTime(earliest),
                 formatLocalDateTime(latest),
-                totalDays)
+                totalDays,
+            )
             if (numberOfReadingsOnLastDay < 48) {
                 totalDays -= 1
                 val lastDaysReadings = readingsByDate[toLocalDate(latest)]
@@ -62,7 +63,8 @@ class Application(val api: Octopus) : CommandLineRunner {
                         kWh(totalUsage),
                         formatLocalDateTime(earliest),
                         formatLocalDateTime(penultimateReading!!.to),
-                        totalDays)
+                        totalDays,
+                    )
                 }
             }
             var lowest = Double.MAX_VALUE
@@ -88,13 +90,15 @@ class Application(val api: Octopus) : CommandLineRunner {
                     numberOfReadingsByDate[date],
                     if (lowest == usage) " (lowest)" else "",
                     if (highest == usage) " (highest)" else "",
-                    if (48 != numberOfReadingsByDate[date]) " *" else "")
+                    if (48 != numberOfReadingsByDate[date]) " *" else "",
+                )
             }
             log.info("mean usage per day over {} days was: {}", totalDays, kWh(totalUsage / totalDays))
             log.info(
                 "median usage per day over {} days was: {}",
                 totalDays,
-                kWh(median(usageByDate.values.stream().sorted().collect(Collectors.toList()))))
+                kWh(median(usageByDate.values.stream().sorted().collect(Collectors.toList()))),
+            )
         } else {
             log.info("no readings available")
         }

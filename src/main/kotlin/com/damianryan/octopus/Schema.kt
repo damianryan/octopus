@@ -16,7 +16,7 @@ data class Property(
     var county: String? = null,
     var postcode: String? = null,
     @JsonProperty("electricity_meter_points") var electricityMeterPoints: List<ElectricityMeterPoint>? = null,
-    @JsonProperty("gas_meter_points") var gasMeterPoints: List<GasMeterPoint>? = null
+    @JsonProperty("gas_meter_points") var gasMeterPoints: List<GasMeterPoint>? = null,
 )
 
 data class ElectricityMeterPoint(
@@ -27,25 +27,25 @@ data class ElectricityMeterPoint(
     @JsonProperty("consumption_day") var consumptionDay: Int = 0,
     @JsonProperty("consumption_night") var consumptionNight: Int = 0,
     var meters: List<ElectricityMeter>? = null,
-    var agreements: List<Agreement>? = null
+    var agreements: List<Agreement>? = null,
 )
 
 data class ElectricityMeter(
     @JsonProperty("serial_number") var serialNumber: String? = null,
-    var registers: List<Register>? = null
+    var registers: List<Register>? = null,
 )
 
 data class Register(
     var identifier: String? = null,
     var rate: String? = null,
-    @JsonProperty("is_settlement_register") var settlementRegister: Boolean = false
+    @JsonProperty("is_settlement_register") var settlementRegister: Boolean = false,
 )
 
 data class GasMeterPoint(
     var mprn: String? = null,
     @JsonProperty("consumption_standard") var consumptionStandard: Int = 0,
     var meters: List<GasMeter>? = null,
-    var agreements: List<Agreement>? = null
+    var agreements: List<Agreement>? = null,
 )
 
 data class GasMeter(@JsonProperty("serial_number") var serialNumber: String? = null)
@@ -53,7 +53,7 @@ data class GasMeter(@JsonProperty("serial_number") var serialNumber: String? = n
 data class Agreement(
     @JsonProperty("tariff_code") var tariffCode: String? = null,
     @JsonProperty("valid_from") var validFrom: Instant? = null,
-    @JsonProperty("valid_to") var validTo: Instant? = null
+    @JsonProperty("valid_to") var validTo: Instant? = null,
 )
 
 class Consumption : Page<Reading?>()
@@ -61,7 +61,7 @@ class Consumption : Page<Reading?>()
 data class Reading(
     var consumption: Double = 0.0,
     @JsonProperty("interval_start") var from: Instant? = null,
-    @JsonProperty("interval_end") var to: Instant? = null
+    @JsonProperty("interval_end") var to: Instant? = null,
 ) : Comparable<Reading> {
     override fun compareTo(other: Reading): Int {
         return from!!.compareTo(other.from!!)
@@ -106,7 +106,7 @@ data class Product(
     var dualRegisterElectricityTariffs: Map<String, Map<String, Tariff>>? = null,
     @JsonProperty("single_register_gas_tariffs") var singleRegisterGasTariffs: Map<String, Map<String, Tariff>>? = null,
     @JsonProperty("sample_quotes") var sampleQuotes: Map<String, Map<String, SampleQuote>>? = null,
-    @JsonProperty("sample_consumption") var sampleConsumption: SampleConsumption? = null
+    @JsonProperty("sample_consumption") var sampleConsumption: SampleConsumption? = null,
 ) : Comparable<Product> {
     override fun compareTo(other: Product): Int {
         return fullName!!.compareTo(other.fullName!!)
@@ -121,7 +121,7 @@ data class Rate(
     @JsonProperty("value_exc_vat") var valueExcVAT: Double? = 0.0,
     @JsonProperty("value_inc_vat") var valueIncVAT: Double? = 0.0,
     @JsonProperty("valid_from") var validFrom: Instant? = null,
-    @JsonProperty("valid_to") var validTo: Instant? = null
+    @JsonProperty("valid_to") var validTo: Instant? = null,
 ) {
     override fun toString() = "Rate(${valueIncVAT}p inc VAT between $validFrom and $validTo)"
 }
@@ -138,10 +138,11 @@ data class Tariff(
     @JsonProperty("exit_fees_inc_vat") var exitFeesIncVAT: Double = 0.0,
     var links: List<Link>? = null,
     @JsonProperty("standard_unit_rate_exc_vat") var standardUnitRateExcVAT: Double = 0.0,
-    @JsonProperty("standard_unit_rate_inc_vat") var standardUnitRateIncVAT: Double = 0.0
+    @JsonProperty("standard_unit_rate_inc_vat") var standardUnitRateIncVAT: Double = 0.0,
 ) {
     override fun toString() =
-        "Tariff(standing charge=${standingChargeIncVAT}p inc VAT per day, online discount=${onlineDiscountIncVAT}p inc VAT, " +
+        "Tariff(standing charge=${standingChargeIncVAT}p inc VAT per day, " +
+            "online discount=${onlineDiscountIncVAT}p inc VAT, " +
             "dual fuel discount=${dualFuelDiscountIncVAT}p inc VAT, exit fees=${exitFeesExcVAT}p inc VAT, " +
             "standard unit rate=${standardUnitRateIncVAT}p inc VAT)"
 }
@@ -150,12 +151,12 @@ data class SampleQuote(
     @JsonProperty("electricity_single_rate") var electricitySingleRate: AnnualCost? = null,
     @JsonProperty("electricity_dual_rate") var electricityDualRate: AnnualCost? = null,
     @JsonProperty("dual_fuel_single_rate") var dualFuelSingleRate: AnnualCost? = null,
-    @JsonProperty("dual_fuel_dual_rate") var dualFuelDualRate: AnnualCost? = null
+    @JsonProperty("dual_fuel_dual_rate") var dualFuelDualRate: AnnualCost? = null,
 )
 
 data class AnnualCost(
     @JsonProperty("annual_cost_inc_vat") var incVAT: Int = 0,
-    @JsonProperty("annual_cost_exc_vat") var excVAT: Int = 0
+    @JsonProperty("annual_cost_exc_vat") var excVAT: Int = 0,
 ) {
     override fun toString() = "annual cost of £${twoDP(incVAT.toDouble() / 100)}p"
 }
@@ -164,12 +165,12 @@ data class SampleConsumption(
     @JsonProperty("electricity_single_rate") var electricitySingleRate: ElectricitySingleRate? = null,
     @JsonProperty("electricity_dual_rate") var electricityDualRate: ElectricityDualRate? = null,
     @JsonProperty("dual_fuel_single_rate") var dualFuelSingleRate: DualFuelSingleRate? = null,
-    @JsonProperty("dual_fuel_dual_rate") var dualFuelDualRate: DualFuelDualRate? = null
+    @JsonProperty("dual_fuel_dual_rate") var dualFuelDualRate: DualFuelDualRate? = null,
 )
 
 data class ElectricityDualRate(
     @JsonProperty("electricity_day") var electricityDay: Int = 0,
-    @JsonProperty("electricity_night") var electricityNight: Int = 0
+    @JsonProperty("electricity_night") var electricityNight: Int = 0,
 )
 
 data class ElectricitySingleRate(@JsonProperty("electricity_standard") var electricityStandard: Int = 0)
@@ -177,10 +178,10 @@ data class ElectricitySingleRate(@JsonProperty("electricity_standard") var elect
 data class DualFuelDualRate(
     @JsonProperty("electricity_day") var electricityDay: Int = 0,
     @JsonProperty("electricity_night") var electricityNight: Int = 0,
-    @JsonProperty("gas_standard") var gasStandard: Int = 0
+    @JsonProperty("gas_standard") var gasStandard: Int = 0,
 )
 
 data class DualFuelSingleRate(
     @JsonProperty("electricity_standard") var electricityStandard: Int = 0,
-    @JsonProperty("gas_standard") var gasStandard: Int = 0
+    @JsonProperty("gas_standard") var gasStandard: Int = 0,
 )

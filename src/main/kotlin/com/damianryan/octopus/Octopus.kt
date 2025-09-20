@@ -27,7 +27,8 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
             UriComponentsBuilder.fromUriString(config.accountsUrl!!)
                 .uriVariables(mapOf(ACCOUNT_NUMBER to config.accountNumber!!))
                 .toUriString(),
-            Account::class.java)
+            Account::class.java,
+        )
     }
 
     val home: Property by lazy { account.properties?.get(0)!! }
@@ -43,7 +44,8 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
                 UriComponentsBuilder.fromUriString(config.electricityMpanUrl!!)
                     .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan))
                     .toUriString(),
-                ElectricityMeterPoint::class.java)
+                ElectricityMeterPoint::class.java,
+            )
             .region!!
     }
 
@@ -58,7 +60,8 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
                 .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan, SERIAL_NUMBER to electricityMeter.serialNumber))
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
-            Consumption::class.java)
+            Consumption::class.java,
+        )
     }
 
     val gasReadings: List<Reading?> by lazy {
@@ -68,13 +71,15 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
                 .uriVariables(mapOf(MPRN to gasMeterPoint.mprn, SERIAL_NUMBER to gasMeter.serialNumber))
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
-            Consumption::class.java)
+            Consumption::class.java,
+        )
     }
 
     val electricityUsageByDate: Map<LocalDate, Double> by lazy {
         val readingsByDate: MultiValueMap<LocalDate, Reading> = LinkedMultiValueMap()
         electricityReadings.forEach(
-            Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) })
+            Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) }
+        )
         val result = mutableMapOf<LocalDate, Double>()
         readingsByDate.forEach { (date, readings) -> result.put(date, readings.sumOf { it.consumption }) }
         result
@@ -117,9 +122,12 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
                         .uriVariables(
                             mapOf(
                                 PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
-                                TARIFF_CODE to agreement.tariffCode!!))
+                                TARIFF_CODE to agreement.tariffCode!!,
+                            )
+                        )
                         .queryParam(PERIOD_FROM, agreement.validFrom)
-                        .toUriString())
+                        .toUriString(),
+                )
             }
             .map { pair -> Pair(pair.first, getMany(pair.second, StandingCharge::class.java)[0]) }
             .associate { it.first!! to it.second?.valueIncVAT!! }
@@ -142,7 +150,9 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
                     .uriVariables(
                         mapOf(
                             PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
-                            TARIFF_CODE to agreement.tariffCode!!))
+                            TARIFF_CODE to agreement.tariffCode!!,
+                        )
+                    )
                     .queryParam(PERIOD_FROM, agreement.validFrom)
                     .toUriString()
             }

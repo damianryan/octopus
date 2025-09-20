@@ -3,6 +3,11 @@ spring:
     name: octopus-client
   main:
     banner-mode: off
+    keep-alive: true
+    lazy-initialization: true
+  threads:
+    virtual:
+      enabled: true
 
 logging:
   level:
