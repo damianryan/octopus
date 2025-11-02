@@ -2,7 +2,7 @@
 # plugins
 benManesVersionsPlugin = "0.53.0"
 detektPlugin = "1.23.8"
-ktfmtPlugin = "0.24.0"
+ktfmtPlugin = "0.25.0"
 kotlin = "2.2.20"
 springBoot = "3.5.6"
 
