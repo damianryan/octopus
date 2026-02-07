@@ -1,6 +1,8 @@
 package com.damianryan.octopus
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.bind.ConstructorBinding
+import java.time.ZonedDateTime
 
 /**
  * Octopus application properties.
@@ -18,16 +20,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties
  * @property gasConsumptionUrl Octopus API gas consumption endpoint
  */
 @ConfigurationProperties(prefix = "octopus")
-data class OctopusProperties(
-    var accountNumber: String? = null,
-    var apiKey: String? = null,
-    var accountsUrl: String? = null,
-    var electricityMpanUrl: String? = null,
-    var electricityConsumptionUrl: String? = null,
-    var electricityStandingChargesUrl: String? = null,
-    var electricityStandardUnitRatesUrl: String? = null,
-    var tariffType: String? = null,
-    var fixedRateProductCode: String? = null,
-    var goProductCode: String? = null,
-    var gasConsumptionUrl: String? = null,
+data class OctopusProperties @ConstructorBinding constructor(
+    val accountNumber: String,
+    val apiKey: String,
+    val arrangementDate: ZonedDateTime,
+    val periodFrom: ZonedDateTime,
+    val accountsUrl: String? = null,
+    val electricityMpanUrl: String? = null,
+    val electricityConsumptionUrl: String? = null,
+    val electricityStandingChargesUrl: String? = null,
+    val electricityStandardUnitRatesUrl: String? = null,
+    val tariffType: String? = null,
+    val fixedRateProductCode: String? = null,
+    val goProductCode: String? = null,
+    val gasConsumptionUrl: String? = null,
 )

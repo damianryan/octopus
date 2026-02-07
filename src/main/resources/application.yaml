@@ -19,7 +19,7 @@ octopus:
   # the date when the switch to Octopus actually occurred
   period-from: 2021-07-01T23:00Z
   # direct debit
-  tariff_type: direct_debit_monthly
+  tariff-type: direct_debit_monthly
   # the fixed rate product that was in force at the time of the switch
   fixed-rate-product-code: OE-FIX-24M-21-05-29
   # the 'go' product switched to for electricity on 2021-08-12 at 00:00 BST (2021-08-11 23:00Z)
@@ -34,6 +34,3 @@ octopus:
   electricity-tariffs-url: ${octopus.base-url}/products/{product_code}/electricity-tariffs/{tariff_code}
   electricity-standing-charges-url: ${octopus.electricity-tariffs-url}/standing-charges/
   electricity-standard-unit-rates-url: ${octopus.electricity-tariffs-url}/standard-unit-rates/
-
-solar-edge:
-  base-url: https://monitoringapi.solaredge.com/

@@ -1,5 +1,6 @@
 package com.damianryan.octopus
 
+import com.damianryan.octopus.model.Reading
 import java.time.LocalDate
 import java.util.function.Consumer
 import java.util.stream.Collectors
@@ -10,7 +11,6 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.util.CollectionUtils
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 
 @SpringBootApplication
 class Application(val api: Octopus) : CommandLineRunner {
@@ -20,18 +20,19 @@ class Application(val api: Octopus) : CommandLineRunner {
         logReadings(api.electricityReadings, "electricity")
         logReadings(api.gasReadings, "gas")
         val totalElectricityStandingCharge = api.totalElectricityStandingCharges
-        log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / 100))
+        log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / ONE_HUNDRED))
         log.info("electricity region: {}", api.electricityRegion)
         //        log.info("standard unit rates: {}", api.temp())
     }
 
+    @Suppress("LongMethod")
     private fun logReadings(readings: List<Reading?>, type: String) {
         if (readings.isNotEmpty()) {
             val earliest = readings[0]!!.from
             val lastReading = readings[readings.size - 1]
             val latest = lastReading!!.to
             var totalUsage = readings.sumOf { it?.consumption!! }
-            val readingsByDate: MultiValueMap<LocalDate?, Reading?> = LinkedMultiValueMap()
+            val readingsByDate = LinkedMultiValueMap<LocalDate, Reading>()
             readings.forEach(Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) })
             val numberOfReadingsByDate = readingsByDate.mapValues { it.value.size }
             var numberOfReadingsOnLastDay = numberOfReadingsByDate[toLocalDate(latest)]
@@ -49,11 +50,11 @@ class Application(val api: Octopus) : CommandLineRunner {
                 formatLocalDateTime(latest),
                 totalDays,
             )
-            if (numberOfReadingsOnLastDay < 48) {
+            if (numberOfReadingsOnLastDay < EXPECTED_READINGS_PER_DAY) {
                 totalDays -= 1
                 val lastDaysReadings = readingsByDate[toLocalDate(latest)]
                 if (!CollectionUtils.isEmpty(lastDaysReadings)) {
-                    val lastDaysConsumption = lastDaysReadings?.sumOf { it?.consumption!! }!!
+                    val lastDaysConsumption = lastDaysReadings?.sumOf { it.consumption }!!
                     totalUsage -= lastDaysConsumption
                     log.info(
                         "ignoring last day's {} reading{}, total {} usage {} between {} and {} ({} days)",
@@ -90,7 +91,7 @@ class Application(val api: Octopus) : CommandLineRunner {
                     numberOfReadingsByDate[date],
                     if (lowest == usage) " (lowest)" else "",
                     if (highest == usage) " (highest)" else "",
-                    if (48 != numberOfReadingsByDate[date]) " *" else "",
+                    if (EXPECTED_READINGS_PER_DAY != numberOfReadingsByDate[date]) " *" else "",
                 )
             }
             log.info("mean usage per day over {} days was: {}", totalDays, kWh(totalUsage / totalDays))
@@ -105,10 +106,13 @@ class Application(val api: Octopus) : CommandLineRunner {
     }
 
     companion object {
+        const val ONE_HUNDRED = 100
+        const val EXPECTED_READINGS_PER_DAY = 48
         val log: Logger = LoggerFactory.getLogger(Application::class.java)
     }
 }
 
+@Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     SpringApplication.run(Application::class.java, *args)
 }
