@@ -1,5 +1,18 @@
 package com.damianryan.octopus
 
+import com.damianryan.octopus.model.Account
+import com.damianryan.octopus.model.Agreement
+import com.damianryan.octopus.model.Consumption
+import com.damianryan.octopus.model.ElectricityMeter
+import com.damianryan.octopus.model.ElectricityMeterPoint
+import com.damianryan.octopus.model.GasMeter
+import com.damianryan.octopus.model.GasMeterPoint
+import com.damianryan.octopus.model.Page
+import com.damianryan.octopus.model.Property
+import com.damianryan.octopus.model.Rate
+import com.damianryan.octopus.model.Reading
+import com.damianryan.octopus.model.StandardUnitRate
+import com.damianryan.octopus.model.StandingCharge
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.time.Duration
@@ -20,12 +33,12 @@ import reactor.util.retry.Retry
 
 @Component
 @EnableConfigurationProperties(OctopusProperties::class)
-class Octopus(val client: WebClient, val config: OctopusProperties) {
+class Octopus(val client: WebClient, val octopus: OctopusProperties) {
 
     val account: Account by lazy {
         getSingle(
-            UriComponentsBuilder.fromUriString(config.accountsUrl!!)
-                .uriVariables(mapOf(ACCOUNT_NUMBER to config.accountNumber!!))
+            UriComponentsBuilder.fromUriString(octopus.accountsUrl!!)
+                .uriVariables(mapOf(ACCOUNT_NUMBER to octopus.accountNumber))
                 .toUriString(),
             Account::class.java,
         )
@@ -41,8 +54,8 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
 
     val electricityRegion: String by lazy {
         getSingle(
-                UriComponentsBuilder.fromUriString(config.electricityMpanUrl!!)
-                    .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan))
+                UriComponentsBuilder.fromUriString(octopus.electricityMpanUrl!!)
+                    .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan as Any))
                     .toUriString(),
                 ElectricityMeterPoint::class.java,
             )
@@ -56,8 +69,13 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
     val electricityReadings: List<Reading?> by lazy {
         log.info("fetching electricity consumption")
         getMany(
-            UriComponentsBuilder.fromUriString(config.electricityConsumptionUrl!!)
-                .uriVariables(mapOf(MPAN to electricityMeterPoint.mpan, SERIAL_NUMBER to electricityMeter.serialNumber))
+            UriComponentsBuilder.fromUriString(octopus.electricityConsumptionUrl!!)
+                .uriVariables(
+                    mapOf(
+                        MPAN to electricityMeterPoint.mpan as Any,
+                        SERIAL_NUMBER to electricityMeter.serialNumber as Any,
+                    )
+                )
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
             Consumption::class.java,
@@ -67,8 +85,8 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
     val gasReadings: List<Reading?> by lazy {
         log.info("fetching gas consumption")
         getMany(
-            UriComponentsBuilder.fromUriString(config.gasConsumptionUrl!!)
-                .uriVariables(mapOf(MPRN to gasMeterPoint.mprn, SERIAL_NUMBER to gasMeter.serialNumber))
+            UriComponentsBuilder.fromUriString(octopus.gasConsumptionUrl!!)
+                .uriVariables(mapOf(MPRN to gasMeterPoint.mprn as Any, SERIAL_NUMBER to gasMeter.serialNumber as Any))
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
             Consumption::class.java,
@@ -118,7 +136,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
             .map { agreement ->
                 Pair(
                     agreement.validFrom,
-                    UriComponentsBuilder.fromUriString(config.electricityStandingChargesUrl!!)
+                    UriComponentsBuilder.fromUriString(octopus.electricityStandingChargesUrl!!)
                         .uriVariables(
                             mapOf(
                                 PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
@@ -146,7 +164,7 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
     private val electricityStandardRateLists: List<List<Rate?>> by lazy {
         electricityAgreements
             .map { agreement ->
-                UriComponentsBuilder.fromUriString(config.electricityStandardUnitRatesUrl!!)
+                UriComponentsBuilder.fromUriString(octopus.electricityStandardUnitRatesUrl!!)
                     .uriVariables(
                         mapOf(
                             PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
@@ -161,16 +179,16 @@ class Octopus(val client: WebClient, val config: OctopusProperties) {
 
     fun electricityProductFor(tariffCode: String?) =
         when (tariffCode) {
-            FIXED_PRODUCT -> config.fixedRateProductCode!!
-            else -> config.goProductCode!!
+            FIXED_PRODUCT -> octopus.fixedRateProductCode!!
+            else -> octopus.goProductCode!!
         }
 
-    private fun <T> getSingle(uri: String, type: Class<T>): T =
+    private fun <T> getSingle(uri: String, type: Class<out T>): T =
         client
             .get()
             .uri(uri)
             .accept(MediaType.APPLICATION_JSON)
-            .headers { header: HttpHeaders -> header.setBasicAuth(config.apiKey!!, "") }
+            .headers { header: HttpHeaders -> header.setBasicAuth(octopus.apiKey, "") }
             .retrieve()
             .bodyToMono(type)
             .doOnSuccess { log.debug("got {}", it) }
