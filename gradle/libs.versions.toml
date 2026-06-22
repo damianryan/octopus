@@ -9,7 +9,7 @@ kotlin = "2.3.21"
 springDependencyManagementPlugin = "1.1.7"
 
 # libraries
-threeten = "1.8.0"
+threeten = "1.10.0"
 
 [libraries]
 # libraries with unmanaged versions
