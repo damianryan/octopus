@@ -1,6 +1,5 @@
 package com.damianryan.octopus.model
 
-import com.damianryan.octopus.model.DualFuelSingleRate
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class SampleConsumption(
