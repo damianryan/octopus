@@ -1,6 +1,8 @@
+import com.ncorti.ktfmt.gradle.TrailingCommaManagementStrategy
+
 plugins {
     alias(libs.plugins.benmanesVersions)
-//    alias(libs.plugins.detekt)
+    alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlinSpring)
     alias(libs.plugins.ktfmt)
@@ -21,7 +23,6 @@ kotlin {
     compilerOptions {
         progressiveMode = true
         extraWarnings = true
-        freeCompilerArgs = ["-Xannotation-default-target=param-property"]
     }
 }
 
@@ -49,6 +50,7 @@ ktfmt {
     blockIndent.set(4)
     continuationIndent.set(4)
     removeUnusedImports.set(true)
+    trailingCommaManagementStrategy.set(TrailingCommaManagementStrategy.NONE)
 }
 
 test {

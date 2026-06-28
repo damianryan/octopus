@@ -73,9 +73,7 @@ class Octopus(val client: WebClient, val octopus: OctopusProperties) {
                 .uriVariables(
                     mapOf(
                         MPAN to electricityMeterPoint.mpan as Any,
-                        SERIAL_NUMBER to electricityMeter.serialNumber as Any,
-                    )
-                )
+                        SERIAL_NUMBER to electricityMeter.serialNumber as Any))
                 .queryParam(PERIOD_FROM, movedInAt)
                 .toUriString(),
             Consumption::class.java,
@@ -96,8 +94,7 @@ class Octopus(val client: WebClient, val octopus: OctopusProperties) {
     val electricityUsageByDate: Map<LocalDate, Double> by lazy {
         val readingsByDate: MultiValueMap<LocalDate, Reading> = LinkedMultiValueMap()
         electricityReadings.forEach(
-            Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) }
-        )
+            Consumer { result: Reading? -> readingsByDate.add(toLocalDate(result!!.from)!!, result) })
         val result = mutableMapOf<LocalDate, Double>()
         readingsByDate.forEach { (date, readings) -> result.put(date, readings.sumOf { it.consumption }) }
         result
@@ -141,8 +138,7 @@ class Octopus(val client: WebClient, val octopus: OctopusProperties) {
                             mapOf(
                                 PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
                                 TARIFF_CODE to agreement.tariffCode!!,
-                            )
-                        )
+                            ))
                         .queryParam(PERIOD_FROM, agreement.validFrom)
                         .toUriString(),
                 )
@@ -169,8 +165,7 @@ class Octopus(val client: WebClient, val octopus: OctopusProperties) {
                         mapOf(
                             PRODUCT_CODE to electricityProductFor(agreement.tariffCode),
                             TARIFF_CODE to agreement.tariffCode!!,
-                        )
-                    )
+                        ))
                     .queryParam(PERIOD_FROM, agreement.validFrom)
                     .toUriString()
             }

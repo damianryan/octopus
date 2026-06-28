@@ -1,7 +1,7 @@
 [versions]
 # plugins
 benManesVersionsPlugin = "0.54.0"
-detektPlugin = "1.23.8"
+detektPlugin = "2.0.0-alpha.5"
 ktfmtPlugin = "0.26.0"
 springBoot = "4.1.0"
 kotlin = "2.4.0"
@@ -24,7 +24,7 @@ springBoot-starter-test = { group = "org.springframework.boot", name = "spring-b
 
 [plugins]
 benmanesVersions = { id = "com.github.ben-manes.versions", version.ref = "benManesVersionsPlugin" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPlugin" }
+detekt = { id = "dev.detekt", version.ref = "detektPlugin" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
 kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin"}
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmtPlugin" }
