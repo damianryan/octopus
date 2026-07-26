@@ -4,7 +4,7 @@ benManesVersionsPlugin = "0.54.0"
 detektPlugin = "2.0.0-alpha.5"
 ktfmtPlugin = "0.26.0"
 springBoot = "4.1.0"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 
 springDependencyManagementPlugin = "1.1.7"
 
