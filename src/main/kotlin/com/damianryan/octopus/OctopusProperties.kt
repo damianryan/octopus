@@ -12,16 +12,20 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
  * @property arrangementDate date when arrangement was made with Octopus
  * @property periodFrom date when switch to Octopus actually started
  * @property baseUrl Octopus API base URL
+ * @property electricityProductCode electricity product code
+ * @property electricityRegion electricity region (also known as distribution area, DNO region, or GSP group)
  */
-@ConfigurationProperties(prefix = "octopus")
+@ConfigurationProperties("octopus")
 data class OctopusProperties
 @ConstructorBinding
 constructor(
-    val accountNumber: String = "TBA",
-    val apiKey: String = "TBA",
+    val accountNumber: String,
+    val apiKey: String,
     val arrangementDate: ZonedDateTime,
     val periodFrom: ZonedDateTime,
     val baseUrl: String,
+    val electricityProductCode: String,
+    val electricityRegion: String
 ) {
     val accountsUrl = "/accounts/$accountNumber"
 }

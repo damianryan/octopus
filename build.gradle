@@ -32,17 +32,16 @@ repositories {
 }
 
 dependencies {
-    // annotation processors
     annotationProcessor libs.springBoot.configurationProcessor
 
-    // starters
-    implementation libs.springBoot.starter.web
-    testImplementation libs.springBoot.starter.test
-
-    // libraries
+    implementation libs.springBoot.starter.restclient
     implementation libs.jackson.module.kotlin
     implementation libs.threeten.extra
+
     developmentOnly libs.springBoot.devtools
+
+    testImplementation libs.springBoot.starter.test
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
 ktfmt {
@@ -59,9 +58,10 @@ test {
 }
 
 bootRun.doFirst {
-    def accountNumber = System.getProperty("octopus.account-number")
-    def apiKey = System.getProperty("octopus.api-key")
-
-    systemProperty "octopus.account-number", accountNumber
-    systemProperty "octopus.api-key", apiKey
+    systemProperty "octopus.account-number", System.getProperty("octopus.account-number")
+    systemProperty "octopus.api-key", System.getProperty("octopus.api-key")
+    systemProperty "octopus.electricity-product-code", System.getProperty("octopus.electricity-product-code")
+    systemProperty "octopus.electricity-region", System.getProperty("octopus.electricity-region")
+    systemProperty "octopus.arrangement-date", System.getProperty("octopus.arrangement-date")
+    systemProperty "octopus.period-from", System.getProperty("octopus.period-from")
 }
