@@ -26,11 +26,3 @@ octopus:
   go-product-code: GO-21-05-13
   # base URL of Octopus's REST API
   base-url: https://api.octopus.energy/v1
-  accounts-url: ${octopus.base-url}/accounts/{account_number}/
-  electricity-mpan-url: ${octopus.base-url}/electricity-meter-points/{mpan}/
-  electricity-consumption-url: ${octopus.electricity-mpan-url}meters/{serial_number}/consumption/?order_by=period
-  gas-consumption-url: ${octopus.base-url}/gas-meter-points/{mprn}/meters/{serial_number}/consumption/?order_by=period
-
-  electricity-tariffs-url: ${octopus.base-url}/products/{product_code}/electricity-tariffs/{tariff_code}
-  electricity-standing-charges-url: ${octopus.electricity-tariffs-url}/standing-charges/
-  electricity-standard-unit-rates-url: ${octopus.electricity-tariffs-url}/standard-unit-rates/

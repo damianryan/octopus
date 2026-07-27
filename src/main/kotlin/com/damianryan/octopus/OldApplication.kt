@@ -7,22 +7,22 @@ import java.util.stream.Collectors
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.util.CollectionUtils
 import org.springframework.util.LinkedMultiValueMap
 
 @SpringBootApplication
-class Application(val api: Octopus) : CommandLineRunner {
+@EnableConfigurationProperties(OctopusProperties::class)
+class Application(val api: OldOctopus) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        log.info("switched to Octopus: {}", api.home.movedInAt)
-        logReadings(api.electricityReadings, "electricity")
-        logReadings(api.gasReadings, "gas")
-        val totalElectricityStandingCharge = api.totalElectricityStandingCharges
-        log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / ONE_HUNDRED))
-        log.info("electricity region: {}", api.electricityRegion)
-        //        log.info("standard unit rates: {}", api.temp())
+//        log.info("switched to Octopus: {}", api.home.movedInAt)
+//        logReadings(api.electricityReadings, "electricity")
+//        logReadings(api.gasReadings, "gas")
+//        val totalElectricityStandingCharge = api.totalElectricityStandingCharges
+//        log.info("total electricity standing charge: £{}", twoDP(totalElectricityStandingCharge / ONE_HUNDRED))
+//        log.info("electricity region: {}", api.electricityRegion)
     }
 
     @Suppress("LongMethod")
@@ -110,9 +110,4 @@ class Application(val api: Octopus) : CommandLineRunner {
         const val EXPECTED_READINGS_PER_DAY = 48
         val log: Logger = LoggerFactory.getLogger(Application::class.java)
     }
-}
-
-@Suppress("SpreadOperator")
-fun main(args: Array<String>) {
-    SpringApplication.run(Application::class.java, *args)
 }

@@ -3,6 +3,7 @@ import com.ncorti.ktfmt.gradle.TrailingCommaManagementStrategy
 plugins {
     alias(libs.plugins.benmanesVersions)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kapt)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlinSpring)
     alias(libs.plugins.ktfmt)
@@ -35,7 +36,7 @@ dependencies {
     annotationProcessor libs.springBoot.configurationProcessor
 
     // starters
-    implementation libs.springBoot.starter.webflux
+    implementation libs.springBoot.starter.web
     testImplementation libs.springBoot.starter.test
 
     // libraries
