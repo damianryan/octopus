@@ -3,7 +3,6 @@ import com.ncorti.ktfmt.gradle.TrailingCommaManagementStrategy
 plugins {
     alias(libs.plugins.benmanes.versions)
     alias(libs.plugins.detekt)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.ktfmt)

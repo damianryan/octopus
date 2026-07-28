@@ -28,7 +28,6 @@ spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-star
 [plugins]
 benmanes-versions = { id = "io.github.ben-manes.versions", version.ref = "ben-manes-versions" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
