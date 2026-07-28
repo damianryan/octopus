@@ -5,10 +5,10 @@ import java.time.Instant
 
 data class Reading(
     val consumption: Double = 0.0,
-    @JsonProperty("interval_start") val from: Instant? = null,
-    @JsonProperty("interval_end") val to: Instant? = null,
+    @JsonProperty("interval_start") val from: Instant,
+    @JsonProperty("interval_end") val to: Instant,
 ) : Comparable<Reading> {
     override fun compareTo(other: Reading): Int {
-        return from!!.compareTo(other.from!!)
+        return from.compareTo(other.from)
     }
 }

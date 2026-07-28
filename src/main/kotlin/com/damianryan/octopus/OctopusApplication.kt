@@ -17,10 +17,9 @@ class OctopusApplication(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        log.info("New octopus application")
         val account = octopus.account
         log.info("Account: {}", account.number)
-        log.info("Electricity region: {}", properties.electricityRegion)
+        log.info("Electricity distribution network operator: {}", octopus.dno)
         log.info("Current electricity product: {}", properties.electricityProductCode)
 
         val electricityAgreements = octopus.electricityAgreements

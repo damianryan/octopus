@@ -1,3 +1,3 @@
 package com.damianryan.octopus.model
 
-@Suppress("unused") class StandardUnitRate : Page<Rate?>()
+@Suppress("unused") class StandardUnitRate : Page<Rate>()

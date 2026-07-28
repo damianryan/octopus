@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
 data class Product(
-    val code: String? = null,
+    val code: String,
     val direction: String? = null,
     @JsonProperty("full_name") val fullName: String? = null,
     @JsonProperty("display_name") val displayName: String? = null,
@@ -16,10 +16,10 @@ data class Product(
     @JsonProperty("is_business") val business: Boolean = false,
     @JsonProperty("is_restricted") val restricted: Boolean = false,
     val term: Int? = 0,
-    @JsonProperty("available_from") val availableFrom: Instant? = null,
+    @JsonProperty("available_from") val availableFrom: Instant,
     @JsonProperty("available_to") val availableTo: Instant? = null,
     val links: List<Link>? = null,
-    val brand: String? = null,
+    val brand: String,
     @JsonProperty("tariffs_active_at") val tariffsActiveAt: Instant? = null,
     @JsonProperty("single_register_electricity_tariffs")
     val singleRegisterElectricityTariffs: Map<String, Map<String, Tariff>>? = null,
