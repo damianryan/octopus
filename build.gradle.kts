@@ -1,5 +1,4 @@
 import com.ncorti.ktfmt.gradle.TrailingCommaManagementStrategy
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
     alias(libs.plugins.benmanes.versions)
@@ -16,7 +15,7 @@ group = "com.damianryan"
 
 version = "0.0.1-SNAPSHOT"
 
-java { toolchain { languageVersion.set(JavaLanguageVersion.of(25)) } }
+kotlin { jvmToolchain(25) }
 
 repositories { mavenCentral() }
 
@@ -31,7 +30,7 @@ dependencies {
     developmentOnly(libs.spring.boot.devtools)
 
     testImplementation(libs.spring.boot.starter.test)
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation(kotlin("test"))
 }
 
 ktfmt {
