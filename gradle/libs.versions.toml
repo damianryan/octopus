@@ -1,12 +1,11 @@
 [versions]
 # plugins
-benManesVersionsPlugin = "0.54.0"
-detektPlugin = "2.0.0-alpha.5"
-ktfmtPlugin = "0.26.0"
-springBoot = "4.1.0"
+ben-manes-versions = "0.56.0"
+detekt = "2.0.0-alpha.5"
+ktfmt = "0.26.0"
 kotlin = "2.4.0"
-
-springDependencyManagementPlugin = "1.1.7"
+spring-boot = "4.1.0"
+spring-dependency-management = "1.1.7"
 
 # libraries
 jackson = "3.2.1"
@@ -27,11 +26,11 @@ spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boo
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 
 [plugins]
-benmanes-versions = { id = "com.github.ben-manes.versions", version.ref = "benManesVersionsPlugin" }
-detekt = { id = "dev.detekt", version.ref = "detektPlugin" }
+benmanes-versions = { id = "io.github.ben-manes.versions", version.ref = "ben-manes-versions" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
-ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmtPlugin" }
-spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
-spring-boot-dependencies = { id = "io.spring.dependency-management", version.ref = "springDependencyManagementPlugin" }
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-boot-dependencies = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
