@@ -9,6 +9,9 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.SerializationFeature
+import tools.jackson.databind.json.JsonMapper
 
 /**
  * A [ClientHttpRequestInterceptor] that can log HTTP requests and responses.
@@ -21,6 +24,12 @@ class LoggingClientHttpRequestInterceptor(
     private val logging: RestClientLoggingProperties,
     private val log: Logger = LoggerFactory.getLogger(LoggingClientHttpRequestInterceptor::class.java)
 ) : ClientHttpRequestInterceptor {
+
+    private val jsonMapper: JsonMapper = JsonMapper
+        .builder()
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+        .build()
 
     override fun intercept(
         request: HttpRequest,
@@ -37,7 +46,7 @@ class LoggingClientHttpRequestInterceptor(
             logHeaders(request.headers, "Request")
             log.info("Request URI: {} {}", request.method, request.uri)
             if (body.isNotEmpty()) {
-                log.info("Request body: {}", String(body, StandardCharsets.UTF_8))
+                log.debug("Request body: {}", String(body, StandardCharsets.UTF_8))
             }
         }
     }
@@ -48,7 +57,9 @@ class LoggingClientHttpRequestInterceptor(
             log.info("Response status: {}", response.statusCode)
             logHeaders(response.headers, "Response")
             if (bytes.isNotEmpty()) {
-                log.info("Response body: {}", String(bytes, StandardCharsets.UTF_8))
+                val node = jsonMapper.readTree(bytes)
+                val indented = jsonMapper.writeValueAsString(node)
+                log.debug("Response body:\n{}", indented)
             }
         }
         return ClientHttpResponseWrapper(response, bytes)
@@ -56,7 +67,7 @@ class LoggingClientHttpRequestInterceptor(
 
     private fun logHeaders(headers: HttpHeaders, type: String) {
         if (logging.headers) {
-            log.info("$type headers:")
+            log.debug("$type headers:")
             headers.forEach { name, values -> values.forEach { log.info("{} = {}", name, it) } }
         }
     }

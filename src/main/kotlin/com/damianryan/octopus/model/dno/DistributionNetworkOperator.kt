@@ -19,13 +19,13 @@ enum class DistributionNetworkOperator(
     E(14, "West Midlands", NATIONAL_GRID),
     F(15, "North Eastern England", NORTHERN_POWERGRID),
     G(16, "North Western England", "Electricity North West"),
-    P(17, "Northern Scotland", SCOTTISH_SOUTHERN_ELECTRICITY_NETWORKS),
-    N(18, "Southern Scotland", SP_ENERGY_NETWORKS),
-    J(19, "South Eastern England", UK_POWER_NETWORKS),
     H(20, "Southern England", SCOTTISH_SOUTHERN_ELECTRICITY_NETWORKS),
+    J(19, "South Eastern England", UK_POWER_NETWORKS),
     K(21, "Southern Wales", NATIONAL_GRID),
     L(22, "South Western England", NATIONAL_GRID),
-    M(23, "Yorkshire", NORTHERN_POWERGRID);
+    M(23, "Yorkshire", NORTHERN_POWERGRID),
+    N(18, "Southern Scotland", SP_ENERGY_NETWORKS),
+    P(17, "Northern Scotland", SCOTTISH_SOUTHERN_ELECTRICITY_NETWORKS);
 
     val gspGroupId: String
         get() = "_$name"

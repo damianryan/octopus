@@ -21,7 +21,9 @@ repositories { mavenCentral() }
 dependencies {
     annotationProcessor(libs.spring.boot.configuration.processor)
 
+    implementation(libs.spring.boot.starter.cache)
     implementation(libs.spring.boot.starter.restclient)
+    implementation(libs.caffeine)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.threeten.extra)
