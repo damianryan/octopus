@@ -3,7 +3,7 @@ package com.damianryan.octopus.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
-data class Property(
+@JvmRecord data class Property(
     val id: Int = 0,
     @JsonProperty("moved_in_at") val movedInAt: Instant,
     @JsonProperty("moved_out_at") val movedOutAt: Instant? = null,

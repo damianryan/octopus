@@ -2,7 +2,7 @@ package com.damianryan.octopus.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class SampleConsumption(
+@JvmRecord data class SampleConsumption(
     @JsonProperty("electricity_single_rate") val electricitySingleRate: ElectricitySingleRate? = null,
     @JsonProperty("electricity_dual_rate") val electricityDualRate: ElectricityDualRate? = null,
     @JsonProperty("dual_fuel_single_rate") val dualFuelSingleRate: DualFuelSingleRate? = null,

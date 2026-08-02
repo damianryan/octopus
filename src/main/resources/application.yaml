@@ -1,6 +1,10 @@
 spring:
   application:
     name: octopus-client
+  cache:
+    type: caffeine
+    cache-names:
+      - products
   main:
     banner-mode: off
     keep-alive: true

@@ -2,7 +2,7 @@ package com.damianryan.octopus.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class ElectricityMeterPoint(
+@JvmRecord data class ElectricityMeterPoint(
     @JsonProperty("gsp") val region: String? = null,
     val mpan: String,
     @JsonProperty("profile_class") val profileClass: Int = 0,
