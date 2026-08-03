@@ -3,7 +3,7 @@
 ben-manes-versions = "0.56.0"
 detekt = "2.0.0-alpha.5"
 ktfmt = "0.26.0"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
 
