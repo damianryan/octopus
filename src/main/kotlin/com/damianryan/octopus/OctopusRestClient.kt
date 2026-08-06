@@ -1,11 +1,8 @@
 package com.damianryan.octopus
 
 import com.damianryan.octopus.model.Page
-import com.damianryan.octopus.utils.LoggingClientHttpRequestInterceptor
-import java.net.http.HttpClient
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
@@ -18,19 +15,9 @@ import org.springframework.web.client.RestClientException
 @Component
 class OctopusRestClient(
     private val properties: OctopusProperties,
-    private val requestInterceptor: LoggingClientHttpRequestInterceptor
+    restClientBuilder: RestClient.Builder
 ) {
-    private val delegate: RestClient
-
-    init {
-        val httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
-        delegate =
-            RestClient.builder()
-                .requestFactory(JdkClientHttpRequestFactory(httpClient))
-                .requestInterceptor(requestInterceptor)
-                .baseUrl(properties.baseUrl)
-                .build()
-    }
+    private val delegate: RestClient = restClientBuilder.baseUrl(properties.baseUrl).build()
 
     /**
      * Get a single entity of a specific type from a relative URL path.

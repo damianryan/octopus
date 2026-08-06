@@ -26,6 +26,8 @@ dependencies {
     implementation(libs.caffeine)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
+    implementation(libs.micrometer.registry.prometheus)
+    implementation(libs.micrometer.tracing.bridge.brave)
     implementation(libs.threeten.extra)
 
     developmentOnly(libs.spring.boot.devtools)

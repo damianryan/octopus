@@ -50,16 +50,18 @@ class OctopusApi(
 
     val electricityMeterSerialNumber: String by lazy { electricityMeterPoint.meters.firstOrNull()?.serialNumber!! }
 
-    @Async fun electricityConsumption(): CompletableFuture<List<Reading?>> =
-        // https://api.octopus.energy/v1/electricity-meter-points/{mpan}/meters/{serial_number}/consumption/
-        CompletableFuture.completedFuture(restClient.getMany(
-            "/electricity-meter-points/${mpan}/meters/${electricityMeterSerialNumber}/consumption",
-            Consumption::class.java))
+    // https://api.octopus.energy/v1/electricity-meter-points/{mpan}/meters/{serial_number}/consumption/
+    fun electricityConsumption() : List<Reading?> =
+        restClient.getMany(
+        "/electricity-meter-points/${mpan}/meters/${electricityMeterSerialNumber}/consumption",
+        Consumption::class.java)
 
-    @Async fun electricityAgreements(): CompletableFuture<List<Agreement>> =
-        CompletableFuture.completedFuture(electricityMeterPoint.agreements.sorted().apply {
-            log.info("Electricity agreement count: ${this.size}")
-        })
+    @Async fun electricityConsumptionAsync(): CompletableFuture<List<Reading?>> =
+        CompletableFuture.completedFuture(electricityConsumption())
+
+    fun electricityAgreements(): List<Agreement> = electricityMeterPoint.agreements.sorted().apply {
+        log.info("Electricity agreement count: ${this.size}")
+    }
 
     val gasMeterPoint: GasMeterPoint by lazy { account.properties.firstOrNull()?.gasMeterPoints?.firstOrNull()!! }
 
@@ -67,18 +69,19 @@ class OctopusApi(
 
     val gasMeterSerialNumber: String by lazy { gasMeterPoint.meters.firstOrNull()?.serialNumber!! }
 
-    @Async fun gasConsumption(): CompletableFuture<List<Reading?>> =
-        CompletableFuture.completedFuture(restClient.getMany(
-            "/gas-meter-points/${mprn}/meters/${gasMeterSerialNumber}/consumption",
-            Consumption::class.java))
+    fun gasConsumption(): List<Reading> = restClient.getMany(
+        "/gas-meter-points/${mprn}/meters/${gasMeterSerialNumber}/consumption",
+        Consumption::class.java
+    )
 
-    @Async fun gasAgreements(): CompletableFuture<List<Agreement>> =
-        CompletableFuture.completedFuture(gasMeterPoint.agreements.sorted().apply {
-            log.info("Gas agreements count: ${this.size}")
-        })
+    @Async fun gasConsumptionAsync(): CompletableFuture<List<Reading?>> =
+        CompletableFuture.completedFuture(gasConsumption())
 
-    @Cacheable("products") @Async fun product(code: String) : CompletableFuture<Product> =
-        CompletableFuture.completedFuture(restClient.get("/products/${code}", Product::class.java))
+    fun gasAgreements(): List<Agreement> = gasMeterPoint.agreements.sorted().apply {
+        log.info("Gas agreements count: ${this.size}")
+    }
+
+    @Cacheable("products")fun product(code: String): Product = restClient.get("/products/${code}", Product::class.java)
 
     val electricityProduct: Product by lazy {
         restClient.get("/products/${properties.electricityProductCode}", Product::class.java)

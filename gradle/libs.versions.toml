@@ -21,6 +21,8 @@ jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref
 # libraries with managed versions
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
+micrometer-tracing-bridge-brave = { module = "io.micrometer:micrometer-tracing-bridge-brave" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
