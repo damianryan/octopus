@@ -10,13 +10,13 @@ import java.util.concurrent.CompletableFuture
 @SpringBootApplication(scanBasePackages = ["com.damianryan.octopus"])
 class OctopusApplication(
     private val octopus: OctopusApi,
-    private val tariffService: TariffService,
+    @Suppress("unused") private val tariffService: TariffService,
     private val log: Logger = LoggerFactory.getLogger(OctopusApplication::class.java)
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        val electricityConsumption = octopus.electricityConsumption()
-        val gasConsumption = octopus.gasConsumption()
+        val electricityConsumption = octopus.electricityConsumptionAsync()
+        val gasConsumption = octopus.gasConsumptionAsync()
         CompletableFuture.allOf(electricityConsumption, gasConsumption).join()
 
         log.info("Electricity consumption: {} readings", electricityConsumption.get().size)
