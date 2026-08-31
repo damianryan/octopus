@@ -2,7 +2,8 @@ package com.damianryan.octopus.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-@JvmRecord data class Tariff(
+@JvmRecord
+data class Tariff(
     val code: String? = null,
     @JsonProperty("standing_charge_exc_vat") val standingChargeExcVAT: Double? = 0.0,
     @JsonProperty("standing_charge_inc_vat") val standingChargeIncVAT: Double? = 0.0,

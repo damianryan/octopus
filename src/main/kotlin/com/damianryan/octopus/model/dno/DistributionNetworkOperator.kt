@@ -6,12 +6,8 @@ private const val SCOTTISH_SOUTHERN_ELECTRICITY_NETWORKS = "Scottish & Southern 
 private const val SP_ENERGY_NETWORKS = "SP Energy Networks"
 private const val UK_POWER_NETWORKS = "UK Power Networks"
 
-@Suppress("unused")
-enum class DistributionNetworkOperator(
-    val id: Int,
-    val region: String,
-    val operator: String
-) {
+@Suppress("unused", "MagicNumber")
+enum class DistributionNetworkOperator(val id: Int, val region: String, val operator: String) {
     A(10, "Eastern England", UK_POWER_NETWORKS),
     B(11, "East Midlands", NATIONAL_GRID),
     C(12, "London", UK_POWER_NETWORKS),

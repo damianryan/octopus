@@ -3,7 +3,8 @@ package com.damianryan.octopus.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
-@JvmRecord data class Agreement(
+@JvmRecord
+data class Agreement(
     @JsonProperty("tariff_code") val tariffCode: String,
     @JsonProperty("valid_from") val validFrom: Instant,
     @JsonProperty("valid_to") val validTo: Instant? = null,

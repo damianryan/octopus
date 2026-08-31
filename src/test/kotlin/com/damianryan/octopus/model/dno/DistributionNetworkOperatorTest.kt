@@ -22,7 +22,8 @@ class DistributionNetworkOperatorTest {
     }
 
     companion object {
-        @JvmStatic fun dnos() =
+        @JvmStatic
+        fun dnos() =
             listOf(
                 Arguments.of("1014469335569", DistributionNetworkOperator.A),
                 Arguments.of("1114469335568", DistributionNetworkOperator.B),
