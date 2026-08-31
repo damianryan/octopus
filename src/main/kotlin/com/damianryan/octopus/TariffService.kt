@@ -14,26 +14,21 @@ class TariffService(
     private val products: List<Product>
 
     init {
-       val productCodes = taskScope {
-           val electricityAgreements = fork { octopus.electricityAgreements() }
-           val gasAgreements = fork { octopus.gasAgreements() }
-           join()
-           val codes = electricityAgreements.get().map { it.productCode }.toMutableSet()
-           codes.addAll(gasAgreements.get().map { it.productCode })
-           codes.toSet()
-       }
+        val productCodes = taskScope {
+            val electricityAgreements = fork { octopus.electricityAgreements() }
+            val gasAgreements = fork { octopus.gasAgreements() }
+            join()
+            val codes = electricityAgreements.get().map { it.productCode }.toMutableSet()
+            codes.addAll(gasAgreements.get().map { it.productCode })
+            codes.toSet()
+        }
 
         products = taskScope {
             val productFutures = productCodes.map { code ->
-                fork {
-                    octopus.product(code).apply {
-                        log.info("Product: {} - {}", code, description)
-                    }
-                }
+                fork { octopus.product(code).apply { log.info("Product: {} - {}", code, description) } }
             }
             join()
             productFutures.map { it.get() }
         }
     }
 }
-

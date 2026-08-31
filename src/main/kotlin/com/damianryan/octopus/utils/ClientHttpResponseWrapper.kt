@@ -8,7 +8,7 @@ import org.springframework.http.client.ClientHttpResponse
 
 /**
  * A wrapper for a [ClientHttpResponse] that allows the response body to be read again after it's been consumed by a
- * [LoggingClientHttpRequestInterceptor].
+ * [LoggingInterceptor].
  *
  * @property response a client HTTP response
  * @property body a copy of the response body from the client HTTP response

@@ -2,7 +2,8 @@ package com.damianryan.octopus.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-@JvmRecord data class ElectricityMeter(
+@JvmRecord
+data class ElectricityMeter(
     @JsonProperty("serial_number") val serialNumber: String,
     val registers: List<Register>,
 )

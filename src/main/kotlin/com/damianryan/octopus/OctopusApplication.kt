@@ -1,11 +1,11 @@
 package com.damianryan.octopus
 
+import com.damianryan.octopus.concurrency.taskScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import java.util.concurrent.CompletableFuture
 
 @SpringBootApplication(scanBasePackages = ["com.damianryan.octopus"])
 class OctopusApplication(
@@ -15,12 +15,13 @@ class OctopusApplication(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        val electricityConsumption = octopus.electricityConsumptionAsync()
-        val gasConsumption = octopus.gasConsumptionAsync()
-        CompletableFuture.allOf(electricityConsumption, gasConsumption).join()
-
-        log.info("Electricity consumption: {} readings", electricityConsumption.get().size)
-        log.info("Gas consumption: {} readings", gasConsumption.get().size)
+        taskScope {
+            val electricityConsumption = fork { octopus.electricityConsumption() }
+            val gasConsumption = fork { octopus.gasConsumption() }
+            join()
+            electricityConsumption.get().apply { log.info("Electricity {} readings", size) }
+            gasConsumption.get().apply { log.info("Gas {} readings", size) }
+        }
     }
 }
 

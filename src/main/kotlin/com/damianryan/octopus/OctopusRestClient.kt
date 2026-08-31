@@ -13,10 +13,7 @@ import org.springframework.web.client.RestClientException
  * @property properties Octopus REST API properties
  */
 @Component
-class OctopusRestClient(
-    private val properties: OctopusProperties,
-    restClientBuilder: RestClient.Builder
-) {
+class OctopusRestClient(private val properties: OctopusProperties, restClientBuilder: RestClient.Builder) {
     private val delegate: RestClient = restClientBuilder.baseUrl(properties.baseUrl).build()
 
     /**

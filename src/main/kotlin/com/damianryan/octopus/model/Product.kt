@@ -3,7 +3,8 @@ package com.damianryan.octopus.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
-@JvmRecord data class Product(
+@JvmRecord
+data class Product(
     val code: String,
     val direction: String? = null,
     @JsonProperty("full_name") val fullName: String? = null,

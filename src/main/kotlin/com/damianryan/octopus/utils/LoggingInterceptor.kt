@@ -20,16 +20,16 @@ import tools.jackson.databind.json.JsonMapper
  * @property log logger
  */
 @Component
-class LoggingClientHttpRequestInterceptor(
+class LoggingInterceptor(
     private val logging: RestClientLoggingProperties,
-    private val log: Logger = LoggerFactory.getLogger(LoggingClientHttpRequestInterceptor::class.java)
+    private val log: Logger = LoggerFactory.getLogger(LoggingInterceptor::class.java)
 ) : ClientHttpRequestInterceptor {
 
-    private val jsonMapper: JsonMapper = JsonMapper
-        .builder()
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-        .build()
+    private val jsonMapper: JsonMapper =
+        JsonMapper.builder()
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+            .build()
 
     override fun intercept(
         request: HttpRequest,
