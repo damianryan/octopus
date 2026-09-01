@@ -1,6 +1,6 @@
 package com.damianryan.octopus
 
-import com.damianryan.octopus.concurrency.taskScope
+import com.damianryan.octopus.concurrency.awaitAllSuccessfulOrThrow
 import com.damianryan.octopus.model.Product
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,7 +14,7 @@ class TariffService(
     private val products: List<Product>
 
     init {
-        val productCodes = taskScope {
+        val productCodes = awaitAllSuccessfulOrThrow {
             val electricityAgreements = fork { octopus.electricityAgreements() }
             val gasAgreements = fork { octopus.gasAgreements() }
             join()
@@ -23,7 +23,7 @@ class TariffService(
             codes.toSet()
         }
 
-        products = taskScope {
+        products = awaitAllSuccessfulOrThrow {
             val productFutures = productCodes.map { code ->
                 fork { octopus.product(code).apply { log.info("Product: {} - {}", code, description) } }
             }

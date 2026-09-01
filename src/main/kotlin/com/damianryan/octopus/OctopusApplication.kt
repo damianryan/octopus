@@ -1,6 +1,6 @@
 package com.damianryan.octopus
 
-import com.damianryan.octopus.concurrency.taskScope
+import com.damianryan.octopus.concurrency.awaitAllSuccessfulOrThrow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
@@ -15,7 +15,7 @@ class OctopusApplication(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        taskScope {
+        awaitAllSuccessfulOrThrow {
             val electricityConsumption = fork { octopus.electricityConsumption() }
             val gasConsumption = fork { octopus.gasConsumption() }
             join()
