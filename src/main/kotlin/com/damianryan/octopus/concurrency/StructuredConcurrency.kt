@@ -10,5 +10,5 @@ import java.util.concurrent.StructuredTaskScope
  * @param R the type of the result returned by joining the scope
  * @return the result of joining the scope.
  */
-inline fun <T, R> taskScope(block: MdcPropagatingTaskScope<T, Void>.() -> R): R =
+inline fun <T, R> awaitAllSuccessfulOrThrow(block: MdcPropagatingTaskScope<T, Void>.() -> R): R =
     MdcPropagatingTaskScope(StructuredTaskScope.open<T>()).use { it.block() }
