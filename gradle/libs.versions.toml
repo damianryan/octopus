@@ -36,4 +36,5 @@ kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-boot-aot = { id = "org.springframework.boot.aot", version.ref = "spring-boot" }
 spring-boot-dependencies = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }

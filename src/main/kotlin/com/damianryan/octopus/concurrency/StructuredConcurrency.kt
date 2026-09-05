@@ -23,10 +23,8 @@ import java.util.concurrent.StructuredTaskScope.Joiner
  * @param block the block of code to execute within the task scope
  * @param T result type of the tasks managed by this scope
  * @param R the type of the result returned by joining the scope
- * @throws StructuredTaskScope.FailedException if any subtask fails, with the first encountered exception as the cause
  * @return the result of joining the scope.
+ * @throws StructuredTaskScope.FailedException if any subtask fails, with the first encountered exception as the cause
  */
 inline fun <T, R> awaitAllSuccessfulOrThrow(block: MdcPropagatingTaskScope<T, Void>.() -> R): R =
     MdcPropagatingTaskScope(StructuredTaskScope.open(Joiner.awaitAllSuccessfulOrThrow<T>())).use { it.block() }
-
-
