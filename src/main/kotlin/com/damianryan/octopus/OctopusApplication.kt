@@ -15,13 +15,20 @@ class OctopusApplication(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        awaitAllSuccessfulOrThrow {
+        val consumptions = awaitAllSuccessfulOrThrow {
             val electricityConsumption = fork { octopus.electricityConsumption() }
             val gasConsumption = fork { octopus.gasConsumption() }
             join()
-            electricityConsumption.get().apply { log.info("Electricity {} readings", size) }
-            gasConsumption.get().apply { log.info("Gas {} readings", size) }
+            mapOf(ELECTRICITY to electricityConsumption.get(), GAS to gasConsumption.get())
         }
+        val electricityConsumption = consumptions[ELECTRICITY] ?: emptyList()
+        val gasConsumption = consumptions[GAS] ?: emptyList()
+        log.info("${electricityConsumption.size} electricity readings, ${gasConsumption.size} gas readings")
+    }
+
+    companion object {
+        const val GAS = "gas"
+        const val ELECTRICITY = "electricity"
     }
 }
 

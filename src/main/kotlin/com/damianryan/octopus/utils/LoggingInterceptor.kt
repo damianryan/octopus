@@ -67,8 +67,7 @@ class LoggingInterceptor(
 
     private fun logHeaders(headers: HttpHeaders, type: String) {
         if (logging.headers) {
-            log.debug("$type headers:")
-            headers.forEach { name, values -> values.forEach { log.info("{} = {}", name, it) } }
+            headers.forEach { name, values -> values.forEach { log.info("$type header {} = {}", name, it) } }
         }
     }
 }

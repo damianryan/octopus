@@ -1,7 +1,7 @@
 package com.damianryan.octopus.utils
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.bind.ConstructorBinding
+import org.springframework.boot.context.properties.bind.DefaultValue
 
 /**
  * Rest client logging configuration.
@@ -10,8 +10,6 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
  * @property headers whether request and response headers should be logged
  */
 @ConfigurationProperties("rest-client.logging")
-data class RestClientLoggingProperties
-@ConstructorBinding
-constructor(val enabled: Boolean = true, val headers: Boolean = false) {
-    @Suppress("unused") constructor() : this(true, false)
-}
+data class RestClientLoggingProperties(
+    @DefaultValue("true") val enabled: Boolean,
+    @DefaultValue("false") val headers: Boolean)
