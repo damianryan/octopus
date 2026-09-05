@@ -12,4 +12,5 @@ import org.springframework.boot.context.properties.bind.DefaultValue
 @ConfigurationProperties("rest-client.logging")
 data class RestClientLoggingProperties(
     @DefaultValue("true") val enabled: Boolean,
-    @DefaultValue("false") val headers: Boolean)
+    @DefaultValue("false") val headers: Boolean
+)
